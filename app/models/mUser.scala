@@ -139,7 +139,7 @@ object mUser {
     }
   }
 
-  private def hashPass(password: String): String =
+  def hashPass(password: String): String =
     Crypt.sha1(Crypt.md5(Crypt.sha1(password)))
 
 }

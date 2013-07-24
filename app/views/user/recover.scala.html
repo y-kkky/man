@@ -2,12 +2,12 @@
 @import helper.twitterBootstrap._
 @import views.html.layouts.main
 @main("Забули пароль?"){
-    @helper.form(routes.User.authenticate) {
+    @helper.form(routes.User.recoverPassword) {
         <div class="well">
             <h1>Забули пароль?</h1>
 
             @helper.inputText(myForm("email"), '_label -> "Введіть поштову скриньку, яка була вказана при реєстрації", '_showConstraints -> false, '_error -> <span class="label label-important">Важно</span>)
-            <button type="submit" class="btn btn-primary" id="loginbutton">Далі</button>
+            <button type="submit" class="btn btn-primary" id="nextbutton">Далі</button>
         </div>
     }
 }

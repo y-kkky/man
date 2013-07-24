@@ -17,3 +17,4 @@ dist
 .gitignore~
 .target
 /.target
+idea-version

@@ -1,4 +1,4 @@
-@(myForm: Form[(String, String, String, String)], gravatar: String)(implicit flash: Flash, request: play.api.mvc.Request[Any])
+@(myForm: Form[(String, String, String, String, String)], gravatar: String)(implicit flash: Flash, request: play.api.mvc.Request[Any])
 @import helper.twitterBootstrap._
 @import views.html.layouts.main
 @main("Редагувати профіль"){
@@ -31,8 +31,9 @@
                         <button type="submit" class="btn btn-primary" id="loginbutton">Готово</button>
                     </div>
 	    		    <div class="tab-pane" id="tab2">
-		    		    @helper.inputPassword(myForm("password"), '_label -> "Пароль", '_showConstraints -> false)
-	            		@helper.inputPassword(myForm("confirm"), '_label -> "Підтвердження пароля", '_showConstraints -> false)
+		    		    @helper.inputPassword(myForm("password"), '_label -> "Старий пароль", '_showConstraints -> false)
+	            		@helper.inputPassword(myForm("newpass"), '_label -> "Новий пароль", '_showContsraints -> false)
+                        @helper.inputPassword(myForm("confirm"), '_label -> "Підтвердження пароля", '_showConstraints -> false)
                         <button type="submit" class="btn btn-primary" id="loginbutton">Готово</button>
                     </div>
                     <div class="tab-pane" id="tab3">

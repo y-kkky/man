@@ -36,15 +36,18 @@ object User extends Controller with Secured {
       "email" -> nonEmptyText(5, 50),
       "name" -> nonEmptyText,
       "password" -> text,
+      "newpass" -> text,
       "confirm" -> text))
 
   val recoverForm = Form(
-    "email" -> nonEmptyText(5, 50)
+    "email" -> nonEmptyText.verifying ("Немає користувача з такою поштою", result => result match {
+      case email => !mUser.checkUser(email)
+    })
   )
 
   /**
-  * Регистрация
-  */
+   * Регистрация
+   */
 
   // Страница регистрации
   def register = Action {
@@ -63,11 +66,11 @@ object User extends Controller with Secured {
             mUser.create(user._1, user._2, user._3)
             sendEmail(user._1,
               s"""
-              Вітаю, $user._2
+              Вітаю, ${user._2}
               Ви були успішно зареєстровані!
 
-              Ваша пошта: $user._1
-              Ваш пароль: $user._3
+              Ваша пошта: ${user._1}
+              Ваш пароль: ${user._3}
 
               З повагою, Ярослав Круковський.
             """)
@@ -113,7 +116,7 @@ object User extends Controller with Secured {
   def edit = withUser {
     user =>
       implicit request =>
-        Ok(views.html.user.edit(editForm.fill(user.email, user.name, "", ""), gravatarFor(user.email)))
+        Ok(views.html.user.edit(editForm.fill(user.email, user.name, "", "", ""), gravatarFor(user.email)))
   }
 
   // Обработка даных из формы редактирования профиля.
@@ -122,11 +125,14 @@ object User extends Controller with Secured {
       editForm.bindFromRequest.fold(
         formWithErrors => BadRequest(views.html.user.edit(formWithErrors, gravatarFor(username(request).toString))),
         user => {
-          if (user._3 != user._4) Redirect(routes.User.edit).flashing("error" -> "Ви ввели різні паролі")
+          val uuser = mUser.findByEmail(user._1)
+          if (user._4 != user._5) Redirect(routes.User.edit).flashing("error" -> "Ви ввели різні паролі")
+          if (uuser.pass != mUser.hashPass(user._3))
+            Redirect(routes.User.edit).flashing("error" -> "Ви невірно ввели старий пароль!")
           else {
-            val uuser = mUser.findByEmail(user._1)
-            if (user._3 != "" && user._4 != "")
-              mUser.edit(uuser.id, user._1, user._2, user._3)
+
+            if (user._4 != "" && user._5 != "")
+              mUser.edit(uuser.id, user._1, user._2, user._4)
             else
               mUser.edit(uuser.id, user._1, user._2, uuser.pass)
             Redirect(routes.User.profile(uuser.id)).flashing(
@@ -144,8 +150,9 @@ object User extends Controller with Secured {
   }
 
   // Страница восстановления пароля.
-  def forgotPassword = Action { implicit request =>
-    Ok(views.html.user.recover(recoverForm))
+  def forgotPassword = Action {
+    implicit request =>
+      Ok(views.html.user.recover(recoverForm))
   }
 
   // Письмо пользователю с ссылкой на страницу восстановления пароля.
@@ -155,11 +162,14 @@ object User extends Controller with Secured {
         formWithErrors => BadRequest(views.html.user.recover(formWithErrors)),
         email => {
           val user = mUser.findByEmail(email)
+
           // Ссылка генерируется по принципу www.example.com/1/2 , где 1 - почта, а 2 - хешированый пароль
-          val href = routes.User.changePassword(email, sha1(user.pass))
+          val href = request.domain + routes.User.changePassword(email, sha1(user.pass))
           sendEmail(user.email,
             s"""
-              Шановний ${user.name}!
+              Шановний ${
+    user.name
+    }!
 
               Ви отримали цей лист через те, що забули пароль (якщо це не так - видаліть лист).
               Для вас буде згенерований новий пароль. Перейдіть, будь ласка, за посиланням:
@@ -173,42 +183,49 @@ object User extends Controller with Secured {
   }
 
   // Если пользователь правильно перешел по ссылке - генерация нового пароля и отправка его по почте
-  def changePassword(email: String, hash: String) = Action { implicit request =>
+  def changePassword(email: String, hash: String) = Action {
+    implicit request =>
     // Отсеивается случай, когда пользователь правильно набрал email, но неправильно - пароль
-    try {
-      val user = mUser.findByEmail(email)
-      if(sha1(user.pass) == hash){
-        val newPass = randomPassword
-        sendEmail(email,
-          s"""
-           Шановний ${user.name}!
+      try {
+        val user = mUser.findByEmail(email)
+        if (sha1(user.pass) == hash) {
+          val newPass = randomPassword
+          sendEmail(email,
+            s"""
+           Шановний ${
+    user.name
+    }!
 
            Ось нові дані для входу на сайт:
 
-           e-mail: ${user.email}
+           e-mail: ${
+    user.email
+    }
            пароль: $newPass
 
-           Ви можете прямо зараз перейти на сайт: ${routes.Static.home}
+           Ви можете прямо зараз перейти на сайт: ${
+    request.domain + routes.Static.home
+    }
 
            З повагою, Ярослав Круковський.
         """.stripMargin)
-        mUser.edit(user.id, user.email, user.name, newPass)
-        Redirect(routes.Static.home()).flashing(
-          "success" -> "Новий пароль висланий на вашу поштову скриньку."
-        )
-      } else
+          mUser.edit(user.id, user.email, user.name, newPass)
+          Redirect(routes.Static.home()).flashing(
+            "success" -> "Новий пароль висланий на вашу поштову скриньку."
+          )
+        } else
         // Отсеивается случай, когда не email, ни хэш пароля введен неправильно
-        NotFound(views.html.errors.onHandlerNotFound(request))
-    } catch {
-      case _ : Throwable => NotFound(views.html.errors.onHandlerNotFound(request))
-    }
+          NotFound(views.html.errors.onHandlerNotFound(request))
+      } catch {
+        case _: Throwable => NotFound(views.html.errors.onHandlerNotFound(request))
+      }
   }
 
   /**
    * Вспомагательные функции
    */
   //Генерация url для Gravatar с использыванием функции md5 библиотеки akka.util.Crypt
-  def gravatarFor(email: String) = "http://www.gravatar.com/avatar/" + md5(email)
+  def gravatarFor(email: String) = "http://www.gravatar.com/avatar/" + md5(email) toLowerCase
 
   def randomPassword: String = {
     randomString("abcdefghijklmnopqrstuvwxyz0123456789")(10)
