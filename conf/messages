@@ -1,0 +1,4 @@
+constraint.required = *
+#Contact Us e-mail request/confirmation
+contact.request.email.from=noreply@zno2014.com
+contact.request.subject=Шановний {0}

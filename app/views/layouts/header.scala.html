@@ -1,0 +1,29 @@
+@()(implicit request: RequestHeader)
+<header class="navbar navbar-fixed-top navbar-static-top">
+  <div class="navbar-inner">
+    <div class="container">    			
+  	  <a href="@routes.Static.home" id="logo">ЗНО 2014</a>
+        <nav>
+    	  <ul class="nav pull-right">
+            <li><a href="@routes.Static.about">Про ЗНО</a></li>
+            @if(request.session.get(Security.username).isEmpty) {
+    			<li><a href="@routes.User.login">Увійти</a></li>
+    			<li><a href="@routes.User.register">Реєстрація</a></li>
+    		} else {
+            <li id="fat-menu" class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                @request.session.get(Security.username) <b class="caret"></b>
+              </a>
+              <ul class="dropdown-menu">
+                <li><a href="@routes.User.profile({request.session.get("id").getOrElse("1").toInt})">Мій профіль</a></li>
+                <li><a href="@routes.User.edit">Змінити профіль</a></li>
+                <li class="divider"> </li>
+                <li><a href="@routes.User.logout">Вийти</a></li>
+              </ul>
+            </li>
+    		}    			
+   		  </ul>
+    	</nav>
+    </div>
+  </div>
+</header>

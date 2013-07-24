@@ -1,0 +1,31 @@
+@(myForm: Form[(String, String, String, String)])(implicit flash: Flash, request: play.api.mvc.Request[Any])
+@import helper.twitterBootstrap._
+@import views.html.layouts.main
+@main("Реєстрація"){
+	@helper.form(routes.Application.createUser) {      
+			<div class="well">      
+            <h1>Реєстрація</h1>            
+            @myForm.globalError.map { error =>
+                <p class="alert alert-error">
+                	<button type="button" class="close" data-dismiss="alert">&times;</button>
+                    @error.message
+                </p>
+            }
+            
+            @flash.get("error").map { message =>
+                <p class="alert alert-error">
+                	<button type="button" class="close" data-dismiss="alert">&times;</button>
+                    @message
+                </p>
+            }
+            
+            
+            @helper.inputText(myForm("email"), '_label -> "Поштова скринька", '_showConstraints -> false)
+            @helper.inputText(myForm("name"), '_label -> "Ім'я", '_showConstraints -> false)
+            @helper.inputPassword(myForm("password"), '_label -> "Пароль", '_showConstraints -> false)
+            @helper.inputPassword(myForm("confirm"), '_label -> "Підтвердження пароля", '_showConstraints -> false)<br>
+            <button type="submit" class="btn btn-primary" id="loginbutton">Реєстрація</button>
+            
+            </div>
+        }
+}

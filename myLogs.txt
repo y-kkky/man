@@ -1,0 +1,89 @@
+2013-07-22T11:10:53.459084+00:00 heroku[api]: Enable Logplex by yarik.just@gmail.com
+2013-07-22T11:10:53.500825+00:00 heroku[api]: Release v2 created by yarik.just@gmail.com
+2013-07-22T11:11:38+00:00 heroku[slug-compiler]: Slug compilation started
+2013-07-22T11:16:57.705632+00:00 heroku[api]: Scale to web=1 by yarik.just@gmail.com
+2013-07-22T11:16:58.347696+00:00 heroku[api]: Attach HEROKU_POSTGRESQL_BRONZE resource by yarik.just@gmail.com
+2013-07-22T11:16:58.372755+00:00 heroku[api]: Release v3 created by yarik.just@gmail.com
+2013-07-22T11:16:58.460234+00:00 heroku[api]: Add DATABASE_URL config by yarik.just@gmail.com
+2013-07-22T11:16:58.485338+00:00 heroku[api]: Release v4 created by yarik.just@gmail.com
+2013-07-22T11:16:58.535110+00:00 heroku[api]: Add PATH, JAVA_OPTS, SBT_OPTS, REPO config by yarik.just@gmail.com
+2013-07-22T11:16:58.572545+00:00 heroku[api]: Release v5 created by yarik.just@gmail.com
+2013-07-22T11:16:58.622155+00:00 heroku[api]: Deploy a1d011e by yarik.just@gmail.com
+2013-07-22T11:16:58.663041+00:00 heroku[api]: Release v6 created by yarik.just@gmail.com
+2013-07-22T11:16:58.706470+00:00 heroku[api]: Deploy a1d011e by yarik.just@gmail.com
+2013-07-22T11:16:59+00:00 heroku[slug-compiler]: Slug compilation finished
+2013-07-22T11:17:06.742274+00:00 heroku[web.1]: Starting process with command `target/start -Dhttp.port=${PORT} ${JAVA_OPTS} -DapplyEvolutions.default=true -Ddb.default.driver=org.postgresql.Driver -Ddb.default.url=${DATABASE_URL}`
+2013-07-22T11:17:07.526372+00:00 app[web.1]: Picked up JAVA_TOOL_OPTIONS:  -Djava.rmi.server.useCodebaseOnly=true
+2013-07-22T11:17:08.527531+00:00 app[web.1]: Play server process ID is 2
+2013-07-22T11:17:09.614269+00:00 app[web.1]: [[37minfo[0m] play - database [default] connected at jdbc:postgresql://ec2-54-225-121-179.compute-1.amazonaws.com:5432/dfao87gtn9shef
+2013-07-22T11:17:09.843576+00:00 app[web.1]: @6f3aeilgc: Database 'default' is in inconsistent state!
+2013-07-22T11:17:09.836120+00:00 app[web.1]:   Position: 14 [ERROR:0, SQLSTATE:42601]
+2013-07-22T11:17:09.836120+00:00 app[web.1]: [[31merror[0m] play - ERROR: syntax error at or near "user"
+2013-07-22T11:17:09.843576+00:00 app[web.1]: Oops, cannot start the server.
+2013-07-22T11:17:09.843576+00:00 app[web.1]: 	at play.api.db.evolutions.Evolutions$.applyScript(Evolutions.scala:275)
+2013-07-22T11:17:09.843576+00:00 app[web.1]: 	at play.api.db.evolutions.EvolutionsPlugin$$anonfun$onStart$1$$anonfun$apply$1.apply$mcV$sp(Evolutions.scala:446)
+2013-07-22T11:17:09.843576+00:00 app[web.1]: 	at play.api.db.evolutions.EvolutionsPlugin.onStart(Evolutions.scala:437)
+2013-07-22T11:17:09.843576+00:00 app[web.1]: 	at play.api.db.evolutions.Evolutions$.checkEvolutionsState(Evolutions.scala:177)
+2013-07-22T11:17:09.843576+00:00 app[web.1]: 	at play.api.db.evolutions.EvolutionsPlugin.withLock(Evolutions.scala:483)
+2013-07-22T11:17:09.843576+00:00 app[web.1]: 	at scala.collection.immutable.List.foreach(List.scala:309)
+2013-07-22T11:17:09.843939+00:00 app[web.1]: 	at play.api.Play$$anonfun$start$1$$anonfun$apply$mcV$sp$1.apply(Play.scala:63)
+2013-07-22T11:17:09.843576+00:00 app[web.1]: 	at play.api.db.evolutions.EvolutionsPlugin$$anonfun$onStart$1.apply(Evolutions.scala:439)
+2013-07-22T11:17:09.843576+00:00 app[web.1]: 	at play.api.db.evolutions.EvolutionsPlugin$$anonfun$onStart$1.apply(Evolutions.scala:437)
+2013-07-22T11:17:09.843939+00:00 app[web.1]: 	at play.api.Play$$anonfun$start$1.apply$mcV$sp(Play.scala:63)
+2013-07-22T11:17:09.843939+00:00 app[web.1]: 	at play.api.Play$$anonfun$start$1$$anonfun$apply$mcV$sp$1.apply(Play.scala:63)
+2013-07-22T11:17:09.843939+00:00 app[web.1]: 	at play.api.Play$$anonfun$start$1.apply(Play.scala:63)
+2013-07-22T11:17:09.844105+00:00 app[web.1]: 	at play.core.server.NettyServer$$anonfun$main$5.apply(NettyServer.scala:258)
+2013-07-22T11:17:09.843939+00:00 app[web.1]: 	at scala.collection.immutable.List.foreach(List.scala:309)
+2013-07-22T11:17:09.843939+00:00 app[web.1]: 	at play.api.Play$$anonfun$start$1.apply(Play.scala:63)
+2013-07-22T11:17:09.844105+00:00 app[web.1]: 	at play.core.server.NettyServer$$anonfun$main$5.apply(NettyServer.scala:259)
+2013-07-22T11:17:09.844105+00:00 app[web.1]: 	at play.core.server.NettyServer$.main(NettyServer.scala:258)
+2013-07-22T11:17:09.843939+00:00 app[web.1]: 	at play.core.server.NettyServer$.createServer(NettyServer.scala:228)
+2013-07-22T11:17:09.843939+00:00 app[web.1]: 	at play.core.StaticApplication.<init>(ApplicationProvider.scala:54)
+2013-07-22T11:17:09.844105+00:00 app[web.1]: 	at scala.Option.map(Option.scala:145)
+2013-07-22T11:17:09.843939+00:00 app[web.1]: 	at play.utils.Threads$.withContextClassLoader(Threads.scala:18)
+2013-07-22T11:17:09.843939+00:00 app[web.1]: 	at play.api.Play$.start(Play.scala:62)
+2013-07-22T11:17:09.844105+00:00 app[web.1]: 	at play.core.server.NettyServer.main(NettyServer.scala)
+2013-07-22T11:17:11.103396+00:00 heroku[web.1]: Process exited with status 255
+2013-07-22T11:17:11.116067+00:00 heroku[web.1]: State changed from starting to crashed
+2013-07-22T11:17:11.116841+00:00 heroku[web.1]: State changed from crashed to starting
+2013-07-22T11:17:17.985955+00:00 heroku[web.1]: Starting process with command `target/start -Dhttp.port=${PORT} ${JAVA_OPTS} -DapplyEvolutions.default=true -Ddb.default.driver=org.postgresql.Driver -Ddb.default.url=${DATABASE_URL}`
+2013-07-22T11:17:18.692794+00:00 app[web.1]: Picked up JAVA_TOOL_OPTIONS:  -Djava.rmi.server.useCodebaseOnly=true
+2013-07-22T11:17:19.170291+00:00 app[web.1]: Play server process ID is 2
+2013-07-22T11:17:20.111936+00:00 app[web.1]: [[37minfo[0m] play - database [default] connected at jdbc:postgresql://ec2-54-225-121-179.compute-1.amazonaws.com:5432/dfao87gtn9shef
+2013-07-22T11:17:20.175136+00:00 app[web.1]: [[31merror[0m] play - ERROR: syntax error at or near "user"
+2013-07-22T11:17:20.175136+00:00 app[web.1]:   Position: 14 [ERROR:0, SQLSTATE:42601]
+2013-07-22T11:17:20.178230+00:00 app[web.1]: Oops, cannot start the server.
+2013-07-22T11:17:20.179308+00:00 app[web.1]: 	at play.api.db.evolutions.Evolutions$.evolutionScript(Evolutions.scala:307)
+2013-07-22T11:17:20.178406+00:00 app[web.1]: @6f3aejao2: Database 'default' is in inconsistent state!
+2013-07-22T11:17:20.178985+00:00 app[web.1]: 	at play.api.db.evolutions.Evolutions$.databaseEvolutions(Evolutions.scala:334)
+2013-07-22T11:17:20.179126+00:00 app[web.1]: 	at play.api.db.evolutions.Evolutions$$anonfun$evolutionScript$2.apply(Evolutions.scala:307)
+2013-07-22T11:17:20.178835+00:00 app[web.1]: 	at play.api.db.evolutions.Evolutions$.checkEvolutionsState(Evolutions.scala:177)
+2013-07-22T11:17:20.179216+00:00 app[web.1]: 	at scala.Option.map(Option.scala:145)
+2013-07-22T11:17:20.179473+00:00 app[web.1]: 	at play.api.db.evolutions.EvolutionsPlugin.onStart(Evolutions.scala:437)
+2013-07-22T11:17:20.179473+00:00 app[web.1]: 	at scala.collection.immutable.List.foreach(List.scala:309)
+2013-07-22T11:17:20.179531+00:00 app[web.1]: 	at play.api.Play$$anonfun$start$1$$anonfun$apply$mcV$sp$1.apply(Play.scala:63)
+2013-07-22T11:17:20.179126+00:00 app[web.1]: 	at play.api.db.evolutions.Evolutions$$anonfun$evolutionScript$2.apply(Evolutions.scala:309)
+2013-07-22T11:17:20.179308+00:00 app[web.1]: 	at play.api.db.evolutions.EvolutionsPlugin.withLock(Evolutions.scala:483)
+2013-07-22T11:17:20.179308+00:00 app[web.1]: 	at play.api.db.evolutions.EvolutionsPlugin$$anonfun$onStart$1.apply(Evolutions.scala:439)
+2013-07-22T11:17:20.179473+00:00 app[web.1]: 	at play.api.db.evolutions.EvolutionsPlugin$$anonfun$onStart$1.apply(Evolutions.scala:437)
+2013-07-22T11:17:20.179611+00:00 app[web.1]: 	at play.api.Play$$anonfun$start$1$$anonfun$apply$mcV$sp$1.apply(Play.scala:63)
+2013-07-22T11:17:20.179611+00:00 app[web.1]: 	at scala.collection.immutable.List.foreach(List.scala:309)
+2013-07-22T11:17:20.179308+00:00 app[web.1]: 	at play.api.db.evolutions.EvolutionsPlugin$$anonfun$onStart$1$$anonfun$apply$1.apply$mcV$sp(Evolutions.scala:440)
+2013-07-22T11:17:20.179700+00:00 app[web.1]: 	at play.api.Play$$anonfun$start$1.apply$mcV$sp(Pl
+ay.scala:63)
+2013-07-22T11:17:20.179700+00:00 app[web.1]: 	at play.api.Play$$anonfun$start$1.apply(Play.scala:63)
+2013-07-22T11:17:20.179760+00:00 app[web.1]: 	at play.utils.Threads$.withContextClassLoader(Threads.scala:18)
+2013-07-22T11:17:20.179828+00:00 app[web.1]: 	at play.api.Play$.start(Play.scala:62)
+2013-07-22T11:17:20.179886+00:00 app[web.1]: 	at play.core.server.NettyServer$$anonfun$main$5.apply(NettyServer.scala:259)
+2013-07-22T11:17:20.179990+00:00 app[web.1]: 	at scala.Option.map(Option.scala:145)
+2013-07-22T11:17:20.179700+00:00 app[web.1]: 	at play.api.Play$$anonfun$start$1.apply(Play.scala:63)
+2013-07-22T11:17:20.179828+00:00 app[web.1]: 	at play.core.server.NettyServer$.createServer(NettyServer.scala:228)
+2013-07-22T11:17:20.179886+00:00 app[web.1]: 	at play.core.server.NettyServer$$anonfun$main$5.apply(NettyServer.scala:258)
+2013-07-22T11:17:20.180019+00:00 app[web.1]: 	at play.core.server.NettyServer$.main(NettyServer.scala:258)
+2013-07-22T11:17:20.180315+00:00 app[web.1]: 	at play.core.server.NettyServer.main(NettyServer.scala)
+2013-07-22T11:17:20.179828+00:00 app[web.1]: 	at play.core.StaticApplication.<init>(ApplicationProvider.scala:54)
+2013-07-22T11:17:21.412023+00:00 heroku[web.1]: Process exited with status 255
+2013-07-22T11:17:21.436184+00:00 heroku[web.1]: State changed from starting to crashed
+2013-07-22T11:19:02.343791+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path=/ host=young-ravine-3198.herokuapp.com fwd="109.104.165.96" dyno= connect= service= status=503 bytes=
+2013-07-22T11:19:05.777359+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path=/favicon.ico host=young-ravine-3198.herokuapp.com fwd="109.104.165.96" dyno= connect= service= status=503 bytes=
+2013-07-22T11:19:06.018861+00:00 heroku[router]: at=error code=H10 desc="App crashed" method=GET path=/favicon.ico host=young-ravine-3198.herokuapp.com fwd="109.104.165.96" dyno= connect= service= status=503 bytes=
