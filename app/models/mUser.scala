@@ -7,7 +7,8 @@ import anorm._
 import anorm.SqlParser._
 import akka.util.Crypt
 
-case class mUser(id: Int, email: String, name: String, pass: String)
+case class mUser(id: Int, regtime: String, email: String, name: String,
+                 city: String, school: String, comments: String, pass: String)
 
 object mUser {
   
@@ -18,10 +19,14 @@ object mUser {
    */
   val simple = {
     get[Int]("Users.id") ~
+    get[String]("Users.regtime") ~
     get[String]("Users.email") ~
     get[String]("Users.name") ~
+    get[String]("Users.city") ~
+    get[String]("Users.school") ~
+    get[String]("Users.comments") ~
     get[String]("Users.pass") map {
-      case id~email~name~pass => mUser(id, email, name, pass)
+      case id~regtime~email~name~city~school~comments~pass => mUser(id, regtime, email, name, city, school, comments, pass)
     }
   }
   
@@ -110,29 +115,37 @@ object mUser {
    */
   def create(email: String, name: String, pass: String) = {
     DB.withConnection { implicit connection =>
+      val timestamp: Long = System.currentTimeMillis
       SQL(
         """
-          insert into Users (email,name,pass) values (
-            {email}, {name}, {pass}
+          insert into Users (regtime, email,name,pass,city,school,comments) values (
+            {timestamp}, {email}, {name}, {pass}, {city}, {school}, {comments}
           )
         """
       ).on(
+        'timestamp -> timestamp,
         'email -> email,
         'name -> name,
-        'pass -> hashPass(pass)
+        'pass -> hashPass(pass),
+        'city -> "",
+        'school -> "",
+        'comments -> ""
       ).executeUpdate()
     }
   }
   
-  def edit(id: Int, email: String, name: String, pass: String) = {
+  def edit(id: Int, email: String, name: String, pass: String, city: String, school: String, comments: String) = {
     DB.withConnection { implicit connection => 
      SQL(
      """
-         update Users set email={email}, name={name}, pass={pass} where id={id}
+         update Users set email={email}, name={name}, city={city}, school={school}, comments={comments}, pass={pass} where id={id}
      """
      ).on(
          'email -> email,
          'name -> name,
+         'city -> city,
+         'school -> school,
+         'comments -> comments,
          'id -> id,
          'pass -> hashPass(pass)
      ).executeUpdate()  

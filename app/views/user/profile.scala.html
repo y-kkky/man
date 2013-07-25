@@ -1,21 +1,35 @@
 @(user: mUser, gravatar: String)(implicit flash: Flash, request: play.api.mvc.Request[Any])
 @import views.html.layouts.main
 @main("Профіль"){
-	@flash.get("success").map { message =>			
+	@flash.get("success").map { message =>
                 <div class="alert alert-success">
                 	 <button type="button" class="close" data-dismiss="alert">&times;</button>
                     @message
                 </div>
             }
-    @flash.get("error").map { message =>			
+    @flash.get("error").map { message =>
                 <div class="alert alert-error">
                 	 <button type="button" class="close" data-dismiss="alert">&times;</button>
                     @message
                 </div>
             }
-    <div class="span6 well row">
-    	<div class="span1"><p><img src="@gravatar"/></p></div>
-    	<div class="span3"><p>@user.name</p>
-    	<p><strong>@user.email</strong></p></div>
-    </div>
+        <div class="span7 well row">
+            <div class="span1"><p><img src="@gravatar"/></p></div>
+            <div class="span4">
+                <strong>@user.name</strong>
+                <table><tbody align="left">
+                    <tr><td class="profitem">Пошта:&nbsp;</td><td><strong>@user.email</strong></td></tr>
+                    @if(!user.city.isEmpty) {
+                        <tr><td class="profitem">Місто:</td><td><strong>@user.city</strong></td><br>
+                    }
+                    @if(!user.school.isEmpty) {
+                        <tr><td class="profitem">Школа:&nbsp;</td><td><strong>@user.school</strong></td><br>
+                    }
+                    @if(!user.comments.isEmpty) {
+                        <tr><td class="profitem">Про себе:&nbsp;</td><td><i>@user.comments</i></td></tr>
+                    }
+                </tbody></table>
+            </div><br>
+
+        </div>
 }

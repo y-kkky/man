@@ -1,55 +1,65 @@
-@(myForm: Form[(String, String, String, String, String)], gravatar: String)(implicit flash: Flash, request: play.api.mvc.Request[Any])
+@(gravatar: String, myForm: Form[(String, String, String, String, String, String, String, String)])(implicit flash: Flash, request: play.api.mvc.Request[Any])
 @import helper.twitterBootstrap._
 @import views.html.layouts.main
 @main("Редагувати профіль"){
 	@helper.form(routes.User.changeUser) {
 			<div class="well">        
-            <h1>Змінити особисту інформацію</h1>            
-            @myForm.globalError.map { error =>
-                <p class="alert alert-error">
-                	<button type="button" class="close" data-dismiss="alert">&times;</button>
-                    @error.message
-                </p>
-            }
-            
-            @flash.get("error").map { message =>
-                <p class="alert alert-error">
-                	<button type="button" class="close" data-dismiss="alert">&times;</button>
-                    @message
-                </p>
-            }    
-            <div class="tabbable">
-    		    <ul class="nav nav-tabs">
-    		        <li class="active"><a href="#tab1" data-toggle="tab">Основні дані</a></li>
-                    <li><a href="#tab2" data-toggle="tab">Пароль</a></li>
-                    <li><a href="#tab3" data-toggle="tab">Аватар</a></li>
-    		    </ul>
-	    		<div class="tab-content">
-	    		    <div class="tab-pane active" id="tab1">
-           				@helper.inputText(myForm("email"), '_label -> "Поштова скринька", '_showConstraints -> false)
-            			@helper.inputText(myForm("name"), '_label -> "Ім'я", '_showConstraints -> false)
-                        <button type="submit" class="btn btn-primary" id="loginbutton">Готово</button>
-                    </div>
-	    		    <div class="tab-pane" id="tab2">
-		    		    @helper.inputPassword(myForm("password"), '_label -> "Старий пароль", '_showConstraints -> false)
-	            		@helper.inputPassword(myForm("newpass"), '_label -> "Новий пароль", '_showContsraints -> false)
-                        @helper.inputPassword(myForm("confirm"), '_label -> "Підтвердження пароля", '_showConstraints -> false)
-                        <button type="submit" class="btn btn-primary" id="loginbutton">Готово</button>
-                    </div>
-                    <div class="tab-pane" id="tab3">
-                        Ваш аватар: <br>&nbsp;<img src="@gravatar"/><br><br>
-                        <a href="#" id="example" class="btn btn-danger" rel="popover" data-content="Замість зберігання аватарів на сервері, було вирішено використовувати глобальну систему аватарів 'Gravatar'. Для зміни стандартного аватару натисніть кнопку 'Змінити аватар'. Вам доведеться зареєструватися на сайті. Після реєстрації аватар буде прив'язаний до вашої пошти і доступний на всіх сайтах, що використовують систему Gravatar." data-original-title="Зміна аватару">Увага!</a><br><br>
-                        <script>
-                            $(function (){
-                                $("#example").popover();
-                            })
-                        </script>
-                        <a href="http://ru.gravatar.com/emails" target="_blank" class="btn">Змінити аватар</a>
-                    </div>
-    			</div>
-            
+                <h1>Змінити особисту інформацію</h1>
+                @myForm.globalError.map { error =>
+                    <p class="alert alert-error">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        @error.message
+                    </p>
+                }
 
-            </ul>
+                @flash.get("error").map { message =>
+                    <p class="alert alert-error">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        @message
+                    </p>
+                }
+                <div class="tabbable">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a href="#tab1" data-toggle="tab">Основні дані</a></li>
+                        <li><a href="#tab2" data-toggle="tab">Місце навчання</a></li>
+                        <li><a href="#tab3" data-toggle="tab">Пароль</a></li>
+                        <li><a href="#tab4" data-toggle="tab">Аватар</a></li>
+                        <li><a href="#tab5" data-toggle="tab">Особиста інформація</a></li>
+                        <li><a href="#tab6" data-toggle="tab">Предмети</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab1">
+                            @helper.inputText(myForm("email"), '_label -> "Поштова скринька", '_showConstraints -> false)
+                            @helper.inputText(myForm("name"), '_label -> "Ім'я", '_showConstraints -> false)
+                            <button type="submit" class="btn btn-primary" id="loginbutton">Готово</button>
+                        </div>
+                        <div class="tab-pane" id="tab2">
+                            @helper.inputText(myForm("city"), '_label -> "Місто", '_showConstraints -> false)
+                            @helper.inputText(myForm("school"), '_label -> "Школа", '_showConstraints -> false)
+                            <button type="submit" class="btn btn-primary" id="infobutton">Готово</button>
+                        </div>
+                        <div class="tab-pane" id="tab3">
+                            @helper.inputPassword(myForm("password"), '_label -> "Старий пароль", '_showConstraints -> false)
+                            @helper.inputPassword(myForm("newpass"), '_label -> "Новий пароль", '_showContsraints -> false)
+                            @helper.inputPassword(myForm("confirm"), '_label -> "Підтвердження пароля", '_showConstraints -> false)
+                            <button type="submit" class="btn btn-primary" id="passbutton">Готово</button>
+                        </div>
+                        <div class="tab-pane" id="tab4">
+                            Ваш аватар: <br>&nbsp;<img src="@gravatar"/><br><br>
+                            <a href="#" id="example" class="btn btn-danger" rel="popover" data-content="Замість зберігання аватарів на сервері, було вирішено використовувати глобальну систему аватарів 'Gravatar'. Для зміни стандартного аватару натисніть кнопку 'Змінити аватар'. Вам доведеться зареєструватися на сайті. Після реєстрації аватар буде прив'язаний до вашої пошти і доступний на всіх сайтах, що використовують систему Gravatar." data-original-title="Зміна аватару">Увага!</a><br><br>
+                            <script>
+                                $(function (){
+                                    $("#example").popover();
+                                })
+                            </script>
+                            <a href="http://ru.gravatar.com/emails" target="_blank" class="btn">Змінити аватар</a>
+                        </div>
+                        <div class="tab-pane" id="tab5">
+                            @helper.inputText(myForm("comments"), '_label -> "Особиста інформація", '_showContsraints -> false, '_size -> 200)
+                            <button type="submit" class="btn btn-primary" id="commbutton">Готово</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         }
 }
