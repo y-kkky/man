@@ -10,7 +10,7 @@ create table Users (
   name                      varchar(255) not null,
   city                      varchar(100),
   school                    varchar(100),
-  comments text,
+  comments                  varchar(255),
   lessons                   varchar(13),
   pass                      varchar(255) not null
 );
