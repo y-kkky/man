@@ -276,6 +276,15 @@ object User extends Controller with Secured {
     Stream.continually(random.nextInt(alphabet.size)).map(alphabet).take(n).mkString
   }
 
+  def codeToLessons(code: String) = {
+    var string: String = ""
+    val lessons = Map('1' -> "Українська мова і література", '2' -> "Математика", '3' ->"Англійська мова",
+      '4' -> "Іноземна мова", '5' -> "Фізика", '6' -> "Хімія", '7' -> "Біологія", '8' -> "Географія",
+      '9' -> "Історія України",  'a' -> "Всесвітня історія", 'b' -> "Всесвітня література", 'c' -> "Російська мова")
+    for(char <- code) string += (lessons(char)+". ")
+    string
+  }
+
 }
 
 
