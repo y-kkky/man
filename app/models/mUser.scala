@@ -8,7 +8,7 @@ import anorm.SqlParser._
 import akka.util.Crypt
 
 case class mUser(id: Int, regtime: String, email: String, name: String,
-                 city: String, school: String, comments: String, pass: String)
+                 city: String, school: String, comments: String, lessons: String, pass: String)
 
 object mUser {
   
@@ -25,8 +25,9 @@ object mUser {
     get[String]("Users.city") ~
     get[String]("Users.school") ~
     get[String]("Users.comments") ~
+    get[String]("Users.lessons") ~
     get[String]("Users.pass") map {
-      case id~regtime~email~name~city~school~comments~pass => mUser(id, regtime, email, name, city, school, comments, pass)
+      case id~regtime~email~name~city~school~comments~lessons~pass => mUser(id, regtime, email, name, city, school, comments, lessons, pass)
     }
   }
   
@@ -118,8 +119,8 @@ object mUser {
       val timestamp: Long = System.currentTimeMillis
       SQL(
         """
-          insert into Users (regtime, email,name,pass,city,school,comments) values (
-            {timestamp}, {email}, {name}, {pass}, {city}, {school}, {comments}
+          insert into Users (regtime, email,name,pass,city,school,comments,lessons) values (
+            {timestamp}, {email}, {name}, {pass}, {city}, {school}, {comments}, {lessons}
           )
         """
       ).on(
@@ -129,7 +130,8 @@ object mUser {
         'pass -> hashPass(pass),
         'city -> "",
         'school -> "",
-        'comments -> ""
+        'comments -> "",
+        'lessons -> ""
       ).executeUpdate()
     }
   }
@@ -147,8 +149,21 @@ object mUser {
          'school -> school,
          'comments -> comments,
          'id -> id,
-         'pass -> hashPass(pass)
+         'pass -> pass
      ).executeUpdate()  
+    }
+  }
+
+  def editLessons(id: Int, lessons: String) = {
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          update Users set lessons={lessons} where id={id}
+        """
+      ).on(
+        'id -> id,
+        'lessons -> lessons
+      ).executeUpdate()
     }
   }
 

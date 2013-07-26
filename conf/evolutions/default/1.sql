@@ -11,6 +11,7 @@ create table Users (
   city                      varchar(100),
   school                    varchar(100),
   comments text,
+  lessons                   varchar(13),
   pass                      varchar(255) not null
 );
 

@@ -28,6 +28,9 @@
                     @if(!user.comments.isEmpty) {
                         <tr><td class="profitem">Про себе:&nbsp;</td><td><i>@user.comments</i></td></tr>
                     }
+                    @if(!user.lessons.isEmpty) {
+                        <tr><td class="profitem">Предмети:&nbsp;</td><td>@user.lessons</td></tr>
+                    }
                 </tbody></table>
             </div><br>
 

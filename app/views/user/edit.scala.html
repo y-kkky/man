@@ -1,5 +1,6 @@
-@(gravatar: String, myForm: Form[(String, String, String, String, String, String, String, String)])(implicit flash: Flash, request: play.api.mvc.Request[Any])
+@(gravatar: String, myForm: Form[(String, String, String, String, String, String, String, String)], lessonForm: Form[(Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean, Boolean)])(implicit flash: Flash, request: play.api.mvc.Request[Any])
 @import helper.twitterBootstrap._
+@import helper.checkbox
 @import views.html.layouts.main
 @main("Редагувати профіль"){
 	@helper.form(routes.User.changeUser) {
@@ -57,9 +58,28 @@
                         <div class="tab-pane" id="tab5">
                             @helper.inputText(myForm("comments"), '_label -> "Особиста інформація", '_showContsraints -> false, '_size -> 200)
                             <button type="submit" class="btn btn-primary" id="commbutton">Готово</button>
+                        </div> }
+                        <div class="tab-pane" id="tab6">
+                            @helper.form(routes.User.changeLesson){
+                                <table>
+                                    <tr><td>Українська мова і література&nbsp;&nbsp;&nbsp;</td><td><input type="checkbox" id="ukr" name="ukr" value="true"></td></tr>
+                                    <tr><td>Математика</td><td><input type="checkbox" id="mat" name="mat" value="true"></td></tr>
+                                    <tr><td>Англійська мова</td><td><input type="checkbox" id="ang" name="ang" value="true"></td></tr>
+                                    <tr><td>Іноземна мова</td><td><input type="checkbox" id="ino" name="ino" value="true"></td></tr>
+                                    <tr><td>Фізика</td><td><input type="checkbox" id="fiz" name="fiz" value="true"></td></tr>
+                                    <tr><td>Хімія</td><td><input type="checkbox" id="him" name="him" value="true"></td></tr>
+                                    <tr><td>Біологія</td><td><input type="checkbox" id="bio" name="bio" value="true"></td></tr>
+                                    <tr><td>Географія</td><td><input type="checkbox" id="geo" name="geo" value="true"></td></tr>
+                                    <tr><td>Історія України</td><td><input type="checkbox" id="isy" name="isy" value="true"></td></tr>
+                                    <tr><td>Всесвітня історія</td><td><input type="checkbox" id="isv" name="isv" value="true"></td></tr>
+                                    <tr><td>Всесвітня література</td><td><input type="checkbox" id="lit" name="lit" value="true"></td></tr>
+                                    <tr><td>Російська мова</td><td><input type="checkbox" id="rus" name="rus" value="true"></td></tr>
+                                </table><br>
+
+                                <button type="submit" class="btn btn-primary">Готово</button>
+                            }
                         </div>
                     </div>
                 </div>
             </div>
-        }
 }

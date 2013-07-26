@@ -48,6 +48,24 @@ object User extends Controller with Secured {
     })
   )
 
+  val lessonForm = Form(
+    tuple(
+      "ukr" -> boolean,
+      "mat" -> boolean,
+      "ang" -> boolean,
+      "ino" -> boolean,
+      "fiz" -> boolean,
+      "him" -> boolean,
+      "bio" -> boolean,
+      "geo" -> boolean,
+      //История Украины и всемирная история
+      "isy" -> boolean,
+      "isv" -> boolean,
+      "lit" -> boolean,
+      "rus" -> boolean
+    )
+  )
+
   /**
    * Регистрация
    */
@@ -119,26 +137,47 @@ object User extends Controller with Secured {
   def edit = withUser {
     user =>
       implicit request =>
-        Ok(views.html.user.edit(gravatarFor(user.email), editForm.fill(user.email, user.name, "", "", "", user.city, user.school, user.comments)))
+        Ok(views.html.user.edit(gravatarFor(user.email), editForm.fill(user.email, user.name, "", "", "", user.city, user.school, user.comments), lessonForm))
   }
 
   // Обработка даных из формы редактирования профиля.
-  def changeUser = Action {
+  def changeUser = withUser { uuser =>
     implicit request =>
       editForm.bindFromRequest.fold(
-        formWithErrors => BadRequest(views.html.user.edit(gravatarFor(username(request).toString), formWithErrors)),
+        formWithErrors => BadRequest(views.html.user.edit(gravatarFor(username(request).toString), formWithErrors, lessonForm)),
         user => {
-          val uuser = mUser.findByEmail(user._1)
-          if (user._4 != user._5) Redirect(routes.User.edit).flashing("error" -> "Ви ввели різні паролі")
-          if (user._4 != "" && user._5 != ""){
-            if (uuser.pass != mUser.hashPass(user._3))
-              Redirect(routes.User.edit).flashing("error" -> "Ви невірно ввели старий пароль!")
-            mUser.edit(uuser.id, user._1, user._2, user._4, user._6, user._7, user._8)
-          }else
+          if(user._4 != "" && user._5 != ""){
+            if(uuser.pass != mUser.hashPass(user._3))
+              Redirect(routes.User.edit).flashing("error" -> "Ви неправильно ввели старий пароль")
+            else if(user._4 != user._5)
+              Redirect(routes.User.edit).flashing("error" -> "Ви неправильно ввели підтвердження пароля")
+            else {
+              mUser.edit(uuser.id, user._1, user._2, mUser.hashPass(user._4), user._6, user._7, user._8)
+              Redirect(routes.User.profile(uuser.id)).flashing("success" -> "Пароль був успішно змінений").withSession(Security.username -> user._1)
+            }
+          }else{
             mUser.edit(uuser.id, user._1, user._2, uuser.pass, user._6, user._7, user._8)
-          Redirect(routes.User.profile(uuser.id)).flashing(
-            "success" -> "Інформація була успішно змінена")
+            Redirect(routes.User.profile(uuser.id)).flashing("success" -> "Профіль був успішно змінений").withSession(Security.username -> user._1)
+          }
         })
+  }
+
+  def changeLesson = withUser { user =>
+    implicit request =>
+      lessonForm.bindFromRequest.fold(
+        formWithErrors => BadRequest(views.html.user.edit(gravatarFor(username(request).toString), editForm.fill(user.email, user.name, "", "", "", user.city, user.school, user.comments), lessonForm)),
+        lessons => {
+          val newlist = lessons.productIterator.toList
+          val listComp = List(1, 2, 3, 4, 5, 6, 7, 8, 9, "a", "b", "c")
+          var string: String = ""
+          for(index <- 0 to 11)
+            if(newlist(index)==true) string+=listComp(index)
+          mUser.editLessons(user.id, string)
+          Redirect(routes.User.profile(user.id)).flashing(
+            "success" -> "Інформація про предмети була успішно змінена."
+          )
+        }
+      )
   }
 
   // Отображение профиля пользователя.
@@ -209,7 +248,7 @@ object User extends Controller with Secured {
 
            З повагою, Ярослав Круковський.
         """.stripMargin)
-          mUser.edit(user.id, user.email, user.name, newPass, user.city, user.school, user.comments)
+          mUser.edit(user.id, user.email, user.name, mUser.hashPass(newPass), user.city, user.school, user.comments)
           Redirect(routes.Static.home()).flashing(
             "success" -> "Новий пароль висланий на вашу поштову скриньку."
           )

@@ -17,6 +17,6 @@ object Static extends Controller {
     val proverbs = scala.xml.XML.loadFile("public/proverb.xml")
     // Число пословиц
     val result = proverbs \  ("p" + new Random().nextInt(15).toString)
-    result
+    result.text
   }
 }

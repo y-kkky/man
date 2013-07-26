@@ -22,7 +22,7 @@
             @helper.inputText(myForm("email"), '_label -> "Поштова скринька", '_showConstraints -> false, '_error -> <span class="label label-important">Важно</span>)
             @helper.inputPassword(myForm("password"), '_label -> "Пароль", '_showConstraints -> false)<br>
             <button type="submit" class="btn btn-primary" id="loginbutton">Вхід</button>
-            <br><a href="@routes.User.recoverPassword()">Забули пароль?</a>
+            <br><br><a href="@routes.User.recoverPassword()">Забули пароль?</a>
             </div>
         }
 }
