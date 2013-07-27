@@ -4,11 +4,11 @@
     <div class="container">    			
   	  <a href="@routes.Static.home" id="logo">ЗНО 2014 </a>
         <div class='bubble'>
-            &mdash;&nbsp; <strong>@controllers.Static.randProverb</strong>
+            &mdash;&nbsp;@controllers.Static.randProverb
         </div>
         <nav>
     	  <ul class="nav pull-right">
-            <li><a href="@routes.Static.about">Про ЗНО</a></li>
+            <li><a href="@routes.Static.about">Правила</a></li>
             @if(request.session.get(Security.username).isEmpty) {
     			<li><a href="@routes.User.login">Увійти</a></li>
     			<li><a href="@routes.User.register">Реєстрація</a></li>

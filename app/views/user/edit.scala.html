@@ -4,7 +4,7 @@
 @import views.html.layouts.main
 @main("Редагувати профіль"){
 	@helper.form(routes.User.changeUser) {
-			<div class="well">        
+			<div class="well">   
                 <h1>Змінити особисту інформацію</h1>
                 @myForm.globalError.map { error =>
                     <p class="alert alert-error">
@@ -56,7 +56,7 @@
                             <a href="http://ru.gravatar.com/emails" target="_blank" class="btn">Змінити аватар</a>
                         </div>
                         <div class="tab-pane" id="tab5">
-                            @helper.inputText(myForm("comments"), '_label -> "Особиста інформація", '_showContsraints -> false, '_size -> 200)
+                            @helper.inputText(myForm("comments"), '_label -> "Особиста інформація", '_showContsraints -> false)
                             <button type="submit" class="btn btn-primary" id="commbutton">Готово</button>
                         </div> }
                         <div class="tab-pane" id="tab6">

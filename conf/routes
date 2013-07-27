@@ -11,6 +11,7 @@ GET         /assets/*file                controllers.Assets.at(path="/public", f
 # Another static pages
 GET         /about                       controllers.Static.about
 GET         /contact                     controllers.Static.contact
+GET         /zno                         controllers.Static.zno
 
 # Authentication
 GET         /login                       controllers.User.login
@@ -24,7 +25,7 @@ POST        /register                    controllers.User.createUser
 # Profile
 GET         /profile/edit                controllers.User.edit
 POST        /profile/edit                controllers.User.changeUser
-POST        /profile/editLess                controllers.User.changeLesson
+POST        /profile/editLess            controllers.User.changeLesson
 GET         /profile/:id                 controllers.User.profile(id: Int)
 
 # Password recovery
