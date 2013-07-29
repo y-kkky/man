@@ -10,4 +10,8 @@ object Lessons extends Controller{
     Ok(views.html.lessons.all(Lesson.findAll))
   }
 
+  def lesson(id: Long) = Action {implicit request =>
+    Ok(views.html.lessons.lesson(id))
+  }
+
 }

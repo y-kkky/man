@@ -1,9 +1,12 @@
 @(lessons: Seq[Lesson])(implicit request: play.api.mvc.Request[Any])
 @import layouts._
 @main("Предмети") {
-    <div class="center hero-unit">
         @lessons.map { lesson =>
-            @lesson.name<br>
+            <div class="span2 peoplepic">
+                <a href="@routes.Lessons.lesson(lesson.id)">
+                    <img src="@routes.Assets.at("images/people/"+lesson.id+".jpg")"/>
+                    <span style="font-size: 13px; color: #4D3A7D;">@if(lesson.id==1){Мова і література} else {@lesson.name}</span>
+                </a>
+            </div>
         }
-    </div>
 }
