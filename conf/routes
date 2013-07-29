@@ -32,3 +32,6 @@ GET         /profile/:id                 controllers.User.profile(id: Int)
 GET         /recover                     controllers.User.forgotPassword
 POST        /recover                     controllers.User.recoverPassword
 GET         /recover/:email/:hash        controllers.User.changePassword(email: String, hash: String)
+
+# Lessons
+GET         /lessons                     controllers.Lessons.allLessons

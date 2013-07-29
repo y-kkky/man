@@ -1,0 +1,9 @@
+@(lessons: Seq[Lesson])(implicit request: play.api.mvc.Request[Any])
+@import layouts._
+@main("Предмети") {
+    <div class="center hero-unit">
+        @lessons.map { lesson =>
+            @lesson.name<br>
+        }
+    </div>
+}

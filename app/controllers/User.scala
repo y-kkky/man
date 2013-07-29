@@ -293,7 +293,7 @@ object User extends Controller with Secured {
 
   def allRanks = {
     val ranks = loadXml("public/ranks.xml")
-    (for (elem <- 1 to 9) yield ranks \ ("r" + elem)).toList
+    (for (elem <- 1 to 10) yield ranks \ ("r" + elem)).toList
   }
 
   def loadXml(path: String) = scala.xml.XML.loadFile(path)
