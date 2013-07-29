@@ -285,6 +285,19 @@ object User extends Controller with Secured {
     string
   }
 
+  def rankToText(rank: Int) = {
+    val ranks = loadXml("public/ranks.xml")
+    val result = ranks \ ("r" + rank)
+    result.text
+  }
+
+  def allRanks = {
+    val ranks = loadXml("public/ranks.xml")
+    (for (elem <- 1 to 9) yield ranks \ ("r" + elem)).toList
+  }
+
+  def loadXml(path: String) = scala.xml.XML.loadFile(path)
+
 }
 
 

@@ -1,6 +1,6 @@
 @()(implicit request: play.api.mvc.Request[Any])
 @import layouts._
-@mainfoot("Факти") {
+@mainfoot("Правила") {
     <div class="center hero-unit" xmlns="http://www.w3.org/1999/html">
         <h1>Правила</h1>
 
@@ -42,17 +42,11 @@
     <div class="span9 offset1 well" id="rank">
         <h2>Ранги</h2>
         В залежності від активності людини на сайті (а саме від активності в секції <i>самостійної підготовки</i> - скільки білетів вже розв'язано) вона отримує певний ранг:
-        <table align=center class="ranktab">
+        <br><br><table align=center class="ranktab">
             <tbody>
-                <tr><td class="first">Перший</td><td>За </td></tr>
-                <tr><td class="second">Другий</td><td>За </td></tr>
-                <tr><td class="third">Третій</td><td>За </td></tr>
-                <tr><td class="fourth">Четвертий</td><td>За </td></tr>
-                <tr><td class="fifth">П'ятий</td><td>За </td></tr>
-                <tr><td class="sixth">Шостий</td><td>За </td></tr>
-                <tr><td class="seventh">Сьомий</td><td>За </td></tr>
-                <tr><td class="eight">Восьмий</td><td>За </td></tr>
-                <tr><td class="nineth">Дев'ятий</td><td>За </td></tr>
+                @for(elem <- User.allRanks) {
+                    <tr><td class="@("r"+(User.allRanks.indexOf(elem) + 1))">@elem.text</td></tr>
+                }
             </tbody>
         </table>
     </div>

@@ -16,7 +16,7 @@
     <div class="span7 well row" onload="rc()">
         <div class="span1"><p><img src="@gravatar"/></p></div>
         <div class="span4">
-            <strong>@user.name</strong>
+            <strong>@user.name</strong>&nbsp;&nbsp;<i class="@("r"+user.rank)">@User.rankToText(user.rank)</i>
             <table><tbody align="left">
                 <tr><td class="profitem">Пошта:&nbsp;</td><td><strong>@user.email</strong></td></tr>
                 @if(!user.city.isEmpty) {

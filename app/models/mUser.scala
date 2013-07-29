@@ -8,7 +8,7 @@ import anorm.SqlParser._
 import akka.util.Crypt
 
 case class mUser(id: Int, regtime: String, email: String, name: String,
-                 city: String, school: String, comments: String, lessons: String, pass: String)
+                 city: String, school: String, comments: String, lessons: String, pass: String, rank: Int)
 
 object mUser {
   
@@ -26,8 +26,9 @@ object mUser {
     get[String]("Users.school") ~
     get[String]("Users.comments") ~
     get[String]("Users.lessons") ~
-    get[String]("Users.pass") map {
-      case id~regtime~email~name~city~school~comments~lessons~pass => mUser(id, regtime, email, name, city, school, comments, lessons, pass)
+    get[String]("Users.pass") ~
+    get[Int]("Users.rank") map {
+      case id~regtime~email~name~city~school~comments~lessons~pass~rank => mUser(id, regtime, email, name, city, school, comments, lessons, pass, rank)
     }
   }
   
@@ -119,8 +120,8 @@ object mUser {
       val timestamp: Long = System.currentTimeMillis
       SQL(
         """
-          insert into Users (regtime, email,name,pass,city,school,comments,lessons) values (
-            {timestamp}, {email}, {name}, {pass}, {city}, {school}, {comments}, {lessons}
+          insert into Users (regtime, email,name,pass,city,school,comments,lessons,rank) values (
+            {timestamp}, {email}, {name}, {pass}, {city}, {school}, {comments}, {lessons}, {rank}
           )
         """
       ).on(
@@ -131,7 +132,8 @@ object mUser {
         'city -> "",
         'school -> "",
         'comments -> "",
-        'lessons -> ""
+        'lessons -> "",
+        'rank -> 1
       ).executeUpdate()
     }
   }
@@ -164,6 +166,12 @@ object mUser {
         'id -> id,
         'lessons -> lessons
       ).executeUpdate()
+    }
+  }
+
+  def updateRank(id: Int) = {
+    DB.withConnection { implicit connection =>
+      SQL("update Users set rank=rank+1").executeUpdate()
     }
   }
 
