@@ -21,7 +21,7 @@ object Lesson {
     }
   }
 
-  def find(id: Int): Lesson = {
+  def find(id: Long): Lesson = {
     DB.withConnection(implicit connection =>
       SQL("select * from Lessons where id={id}").on('id -> id).as(Lesson.simple.single)
     )
@@ -43,7 +43,7 @@ object Bilet {
     }
   }
 
-  def find(id: Int): Bilet = {
+  def find(id: Long): Bilet = {
     DB.withConnection(implicit connection =>
       SQL("select * from Bilets where id={id}").on('id -> id).as(Bilet.simple.single)
     )
@@ -60,7 +60,7 @@ object Question {
     }
   }
 
-  def find(id: Int): Question = {
+  def find(id: Long): Question = {
     DB.withConnection(implicit connection =>
       SQL("select * from Questions where id={id}").on('id -> id).as(Question.simple.single)
     )
@@ -76,7 +76,7 @@ object Variant {
     }
   }
 
-  def find(id: Int): Variant = {
+  def find(id: Long): Variant = {
     DB.withConnection(implicit connection =>
       SQL("select * from Variants where id={id}").on('id -> id).as(Variant.simple.single)
     )

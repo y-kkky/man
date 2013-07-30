@@ -11,7 +11,8 @@ object Lessons extends Controller{
   }
 
   def lesson(id: Long) = Action {implicit request =>
-    Ok(views.html.lessons.lesson(id))
+    val lesson = Lesson.find(id)
+    Ok(views.html.lessons.lesson(lesson))
   }
 
 }

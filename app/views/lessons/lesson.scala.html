@@ -1,6 +1,53 @@
-@(id: Long)(implicit request: play.api.mvc.Request[Any])
+@(lesson: Lesson)(implicit request: play.api.mvc.Request[Any])
 @import layouts._
 @main("Предмети") {
-    <div class="span9 well-large">
+    <div class="spanmax well-large">
+        <span class="lessonName center">@lesson.name</span>
+    </div>
+    <div class="span9 well">
+        <h1>Матеріали</h1>
+        <h4>Офіційні матеріали з сайту центру <a href="http://testportal.gov.ua/" target="_blank">оцінювання якості освіти</a></h4>
+        @if(lesson.id == 1 || lesson.id == 3 || lesson.id == 4 || lesson.id == 12){
+            @if(lesson.id == 4) {
+                <strong>Французська мова</strong><br>
+                <ol>
+                    <li><a href="@routes.Assets.at("files/4/f_krut.pdf")">Критерії оцінювання тестового завдання з розгорнутою відповіддю (власного висловлення).</a></li>
+                    <li><a href="@routes.Assets.at("files/4/f_har.pdf")">Характеристика тесту.</a></li>
+                </ol>
+                <strong>Німецька мова</strong><br>
+                <ol>
+                    <li><a href="@routes.Assets.at("files/4/d_krut.pdf")">Критерії оцінювання тестового завдання з розгорнутою відповіддю (власного висловлення).</a></li>
+                    <li><a href="@routes.Assets.at("files/4/d_har.pdf")">Характеристика тесту.</a></li>
+                </ol>
+                <strong>Загальне програма</strong><br>
+                    <a href="@routes.Assets.at("files/4/prog.pdf")">Програма зовнішнього незалежного оцінювання.</a>
+
+            } else {
+            <ol>
+                <li><a href="@routes.Assets.at("files/"+lesson.id+"/krut.pdf")">Критерії оцінювання тестового завдання з розгорнутою відповіддю (власного висловлення).</a></li>
+                <li><a href="@routes.Assets.at("files/"+lesson.id+"/har.pdf")">Характеристика тесту.</a></li>
+                <li><a href="@routes.Assets.at("files/"+lesson.id+"/prog.pdf")">Програма зовнішнього незалежного оцінювання.</a></li>
+            </ol>
+            }
+        }else {
+            <ol>
+                <li><a href="@routes.Assets.at("files/"+lesson.id+"/har.pdf")">Характеристика тесту.</a></li>
+                <li><a href="@routes.Assets.at("files/"+lesson.id+"/prog.pdf")">Програма зовнішнього незалежного оцінювання.</a></li>
+            </ol>
+        }
+        @lesson.id match {
+            case 1 => {}
+            case 2 => {}
+            case 3 => {}
+            case 4 => {}
+            case 5 => {}
+            case 6 => {}
+            case 7 => {}
+            case 8 => {}
+            case 9 => {}
+            case 10 => {}
+            case 11 => {}
+            case 12 => {}
+        }
     </div>
 }
