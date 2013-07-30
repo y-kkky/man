@@ -5,8 +5,8 @@
         <span class="lessonName center">@lesson.name</span>
     </div>
     <div class="span9 well">
-        <h1>Матеріали</h1>
-        <h4>Офіційні матеріали з сайту центру <a href="http://testportal.gov.ua/" target="_blank">оцінювання якості освіти</a></h4>
+        <h2>Матеріали</h2>
+        <h4>Офіційні матеріали з сайту <a href="http://testportal.gov.ua/" target="_blank">центру оцінювання якості освіти</a></h4>
         @if(lesson.id == 1 || lesson.id == 3 || lesson.id == 4 || lesson.id == 12){
             @if(lesson.id == 4) {
                 <strong>Французська мова</strong><br>
@@ -35,19 +35,21 @@
                 <li><a href="@routes.Assets.at("files/"+lesson.id+"/prog.pdf")">Програма зовнішнього незалежного оцінювання.</a></li>
             </ol>
         }
+
+        <h4>Матеріали, що допоможуть при підготовці</h4>
         @lesson.id match {
-            case 1 => {}
-            case 2 => {}
-            case 3 => {}
-            case 4 => {}
-            case 5 => {}
-            case 6 => {}
-            case 7 => {}
-            case 8 => {}
-            case 9 => {}
-            case 10 => {}
-            case 11 => {}
-            case 12 => {}
+            case 1 => {<a href="#">Посилання на матеріал</a>}
+            case 2 => {<a href="#">Посилання на матеріал</a>}
+            case 3 => {<a href="#">Посилання на матеріал</a>}
+            case 4 => {<a href="#">Посилання на матеріал</a>}
+            case 5 => {<a href="#">Посилання на матеріал</a>}
+            case 6 => {<a href="#">Посилання на матеріал</a>}
+            case 7 => {<a href="#">Посилання на матеріал</a>}
+            case 8 => {<a href="#">Посилання на матеріал</a>}
+            case 9 => {<a href="#">Посилання на матеріал</a>}
+            case 10 => {<a href="#">Посилання на матеріал</a>}
+            case 11 => {<a href="#">Посилання на матеріал</a>}
+            case 12 => {<a href="#">Посилання на матеріал</a>}
         }
     </div>
 }
