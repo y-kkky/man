@@ -22,11 +22,12 @@ GET         /logout                      controllers.User.logout
 GET         /register                    controllers.User.register
 POST        /register                    controllers.User.createUser
 
-# Profile
+# User
 GET         /profile/edit                controllers.User.edit
 POST        /profile/edit                controllers.User.changeUser
 POST        /profile/editLess            controllers.User.changeLesson
 GET         /profile/:id                 controllers.User.profile(id: Int)
+GET 		/preparation 				 controllers.User.preparation
 
 # Password recovery
 GET         /recover                     controllers.User.forgotPassword

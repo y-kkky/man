@@ -13,6 +13,8 @@ case class Question(id: Long, bilet_id: Long, text: String, answer: Long)
 
 case class Variant(id: Long, question_id: Long, text: String)
 
+case class Stat(user_id: Long, lesson_id: Long, bilet_id: Long, question_id: Long, answer: Long)
+
 object Lesson {
   val simple = {
     get[Int]("Lessons.id") ~
@@ -80,5 +82,11 @@ object Variant {
     DB.withConnection(implicit connection =>
       SQL("select * from Variants where id={id}").on('id -> id).as(Variant.simple.single)
     )
+  }
+}
+
+object Stat {
+  val simple = {
+    get[Long]("Stat.user_id")
   }
 }

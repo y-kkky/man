@@ -19,6 +19,7 @@
               </a>
               <ul class="dropdown-menu">
                 <li><a href="@routes.User.profile({request.session.get("id").getOrElse("1").toInt})">Мій профіль</a></li>
+                <li><a href="@routes.User.preparation">Підготовка</a></li>  
                 <li><a href="@routes.User.edit">Змінити профіль</a></li>
                 <li class="divider"> </li>
                 <li><a href="@routes.User.logout">Вийти</a></li>

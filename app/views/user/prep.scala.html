@@ -1,0 +1,26 @@
+@(user: mUser, lessons: Seq[Any])(implicit flash: Flash, request: play.api.mvc.Request[Any])
+@import layouts._
+@mainfoot("Підготовка") {
+    @flash.get("success").map { message =>
+        <div class="alert alert-success">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            @message
+        </div>
+    }
+    @flash.get("error").map { message =>
+        <div class="alert alert-error">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            @message
+        </div>
+    }
+    @lessons.map {lesson =>
+    <div class="lesson well">
+        <h2>@lesson</h2><br>
+        <h2>%</h2>
+        <div class="progress">
+            <div class="bar" style="width: 45%"></div>
+        </div>
+    </div><br><br>
+    }
+
+}

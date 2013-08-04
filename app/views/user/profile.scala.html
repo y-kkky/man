@@ -27,7 +27,10 @@
                         }
                 @if(!user.lessons.isEmpty) {
                     <tr><td class="profitem">
-                        Предмети:&nbsp;</td><td><i style="font-size: 12px; color: blue;">@User.codeToLessons(user.lessons)</i></td></tr>
+                        Предмети:&nbsp;</td><td><i style="font-size: 12px; color: blue;">@User.codeToLessonsArr(user.lessons).map {lesson => 
+                        @lesson
+                        <br>
+                        }</i></td></tr>
                 }
             </tbody></table>
 

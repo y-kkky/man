@@ -260,6 +260,14 @@ object User extends Controller with Secured {
       }
   }
 
+  // Подготовка к ЗНО
+  // Главная страница подготовки
+  def preparation = withUser {
+    user =>
+      implicit request =>
+      val lessons = codeToLessonsArr(user.lessons)
+      Ok(views.html.user.prep(user, lessons))
+  }
   /**
    * Вспомагательные функции
    */
@@ -283,6 +291,14 @@ object User extends Controller with Secured {
       '9' -> "Історія України",  'a' -> "Всесвітня історія", 'b' -> "Всесвітня література", 'c' -> "Російська мова")
     for(char <- code) string += (lessons(char)+". ")
     string
+  }
+
+  def codeToLessonsArr(code: String) = {
+    val lessons = Map('1' -> "Українська мова і література", '2' -> "Математика", '3' ->"Англійська мова",
+      '4' -> "Іноземна мова", '5' -> "Фізика", '6' -> "Хімія", '7' -> "Біологія", '8' -> "Географія",
+      '9' -> "Історія України",  'a' -> "Всесвітня історія", 'b' -> "Всесвітня література", 'c' -> "Російська мова")
+    val less = for(char <- code) yield (lessons(char))
+    less
   }
 
   def rankToText(rank: Int) = {

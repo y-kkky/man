@@ -52,4 +52,9 @@
             case 12 => {<a href="#">Посилання на матеріал</a>}
         }
     </div>
+    @if(!request.session.get(Security.username).isEmpty) {
+    <div class="span9 well">
+        <h2>Тестування</h2>
+    </div>
+    }
 }
