@@ -1,5 +1,7 @@
 @(lesson: Lesson)(implicit request: play.api.mvc.Request[Any])
 @import layouts._
+@import controllers.Lessons
+@import models.mUser
 @main("Предмети") {
     <div class="spanmax well-large">
         <span class="lessonName center">@lesson.name</span>
@@ -53,8 +55,12 @@
         }
     </div>
     @if(!request.session.get(Security.username).isEmpty) {
-    <div class="span9 well">
-        <h2>Тестування</h2>
-    </div>
+      <a href="@routes.Lessons.prep(lesson.id)" style="text-decoration: none; text-align: center;"><div class="span9 lesson well">
+          <h4>Тестування</h4>
+          <h4>@Lessons.lessonStat((mUser.findByEmail(request.session.get(Security.username).getOrElse(""))).id, lesson.id)%</h4>
+          <div class="progress">
+            <div class="bar" style="width: @Lessons.lessonStat((mUser.findByEmail(request.session.get(Security.username).getOrElse(""))).id, lesson.id)%"></div>
+          </div>
+      </div></a>
     }
 }

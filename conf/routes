@@ -37,3 +37,4 @@ GET         /recover/:email/:hash        controllers.User.changePassword(email: 
 # Lessons
 GET         /lessons                     controllers.Lessons.allLessons
 GET         /lesson/:id                  controllers.Lessons.lesson(id: Long)
+GET	    /lesson/:id/preparation	 controllers.Lessons.prep(id: Long)

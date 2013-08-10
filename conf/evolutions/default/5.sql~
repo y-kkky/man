@@ -1,0 +1,7 @@
+# --- BiletStat database schema
+
+# --- !Ups
+INSERT INTO BiletStat (user_id, bilet_id, perc) VALUES (1, 1, 70)
+
+# --- !Downs
+DELETE FROM BiletStat

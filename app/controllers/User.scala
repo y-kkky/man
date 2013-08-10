@@ -5,6 +5,7 @@ import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
 import models.mUser
+import models.Lesson
 import services.EmailService.sendEmail
 import akka.util.Crypt.md5
 import akka.util.Crypt.sha1
@@ -176,10 +177,10 @@ object User extends Controller with Secured {
           Redirect(routes.User.profile(user.id)).flashing(
             "success" -> "Інформація про предмети була успішно змінена."
           )
-        }
+	}
       )
-  }
-
+    }
+  
   // Отображение профиля пользователя.
   def profile(id: Int) = withUser {
     user =>
@@ -265,7 +266,7 @@ object User extends Controller with Secured {
   def preparation = withUser {
     user =>
       implicit request =>
-      val lessons = codeToLessonsArr(user.lessons)
+      val lessons = codeToLessonsList(user.lessons)
       Ok(views.html.user.prep(user, lessons))
   }
   /**
@@ -293,12 +294,20 @@ object User extends Controller with Secured {
     string
   }
 
-  def codeToLessonsArr(code: String) = {
+  def codeToLessonsList(code: String) = {
     val lessons = Map('1' -> "Українська мова і література", '2' -> "Математика", '3' ->"Англійська мова",
       '4' -> "Іноземна мова", '5' -> "Фізика", '6' -> "Хімія", '7' -> "Біологія", '8' -> "Географія",
       '9' -> "Історія України",  'a' -> "Всесвітня історія", 'b' -> "Всесвітня література", 'c' -> "Російська мова")
     val less = for(char <- code) yield (lessons(char))
-    less
+    val list = (for(name <- less) yield Lesson.findByName(name)).toList
+    list
+  }
+
+  def codeToLessonsMap(code: String) = {
+    val lessons = Map('1' -> "Українська мова і література", '2' -> "Математика", '3' ->"Англійська мова",
+      '4' -> "Іноземна мова", '5' -> "Фізика", '6' -> "Хімія", '7' -> "Біологія", '8' -> "Географія",
+      '9' -> "Історія України",  'a' -> "Всесвітня історія", 'b' -> "Всесвітня література", 'c' -> "Російська мова")
+    
   }
 
   def rankToText(rank: Int) = {

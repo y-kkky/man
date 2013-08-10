@@ -1,0 +1,9 @@
+@(lesson: Lesson)(implicit request: play.api.mvc.Request[Any])
+@import layouts._
+@import controllers.Lessons
+@import models.mUser
+@main("Предмети") {
+    <div class="spanmax well-large">
+        <span class="lessonName center">@lesson.name</span>
+    </div>
+}
