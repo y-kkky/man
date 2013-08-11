@@ -7,8 +7,11 @@
         <span class="lessonName center">@lesson.name</span>
     </div>
     <div class="spanmax well">
+      @if(bilets.isEmpty){
+        <h2>Білетів для цього предмету немає</h2>
+      }
       @for(bilet <- bilets.zipWithIndex){
-	<h4>Білет № @((bilet._2)+1)</h4><br>
+	<a href="@routes.Lessons.bilet(bilet._1.id)"><h4>Білет № @((bilet._2)+1)</h4></a><br>
       }
     </div>
 }

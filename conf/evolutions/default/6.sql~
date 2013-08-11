@@ -1,0 +1,8 @@
+# --- First database schema
+
+# --- !Ups
+INSERT INTO Questions (bilet_id, typ, text, answer) Values (1, 1, "Pervii", "hello"), (1, 2, "Vtoroi", "good bye"), (1, 3, "Tretii", "oppa")
+
+
+# --- !Downs
+DELETE FROM Questions

@@ -21,6 +21,7 @@ create table Questions (
   quest_type  integer,
   typ 	      integer,
   text        text,
+  image       varchar,
   answer      integer
 );
 CREATE SEQUENCE variant_id_seq;

@@ -4,7 +4,7 @@
 @if(lessons.isEmpty){
 @main("Підготовка"){
 <div class="hero-unit well">
-  <h2>Для підготовки оберіть предмети, до тестування за якими ви будете готуватися.</h2>
+  <h2>Для підготовки <a href="@routes.User.edit">оберіть предмети</a>, до тестування за якими ви будете готуватися.</h2>
 </div>
 }
 }else{
@@ -30,6 +30,8 @@
         </div>
     </div></a><br><br>
     }
-
+   @if(lessons.length == 1){
+     <br><br><br><br><br><br><br><br><br><br><br><br><br>
+   }
 }
 }

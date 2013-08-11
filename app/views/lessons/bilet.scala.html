@@ -1,0 +1,9 @@
+@(questions: List[Question])(implicit request: play.api.mvc.Request[Any])
+@import layouts._
+@import controllers.Lessons
+@import models.mUser
+@test("Предмети") {
+  @for(question <- questions.zipWithIndex){
+    @Html(Lessons.showQuestion(question._1, question._2))
+  }
+}

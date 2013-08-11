@@ -1,0 +1,15 @@
+@(bilet_id: Long)(implicit request: play.api.mvc.Request[Any])
+@import layouts._
+@import controllers.Lessons
+@import models.mUser
+@main("Предмети") {
+    <div class="spanmax well-large">
+        <span class="lessonName center">@lesson.name</span>
+    </div>
+    <div class="spanmax well">
+      @for(bilet <- bilets.zipWithIndex){
+	<h4>Білет № @((bilet._2)+1)</h4><br>
+	<h4>@bilet.id</h4>
+      }
+    </div>
+}

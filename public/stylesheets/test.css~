@@ -1,0 +1,17 @@
+body {
+    font-family: Tahoma;
+}
+
+#left {
+    width: 200px;
+    float: left;
+}
+
+#right {
+    width: 200;
+    float: right;
+}
+
+#content {
+    margin: 0 200px 0 200px;
+}

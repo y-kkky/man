@@ -1,0 +1,45 @@
+function otmena(){
+    window.onbeforeunload = function(){
+	
+    }
+}
+
+function starter(){
+    if(!confirm("Розпочати розв'язання тесту з урахуванням часу?")){
+	var timer = document.getElementById("timer");
+	timer.parentNode.removeChild(timer);
+    }else{
+	startTimer();
+    }
+}
+function startTimer() {
+    var timer = document.getElementById("timer");
+    var time = timer.innerHTML;
+    var arr = time.split(":");
+    var h = arr[0];
+    var m = arr[1];
+    var s = arr[2];
+    if (s == 0) {
+	if (m == 0) {
+	    if (h == 0) {
+		window.onbeforeunload = function(){
+		}
+		document.getElementById("knop").click();
+		return;
+	    }
+	    h--;
+	    m = 60;
+	    if (h < 10) h = "0" + h;
+	}
+	m--;
+	if (m < 10) m = "0" + m;
+	s = 59;
+    }
+    else s--;
+    if (s < 10) s = "0" + s;
+    document.getElementById("timer").innerHTML = h+":"+m+":"+s;
+    setTimeout(startTimer, 1000);
+}
+window.onbeforeunload = function(){
+    return "Ви впевнені, що хочете покинути/оновити сторінку? Введені вами відповіді будуть втрачені!!!";
+}

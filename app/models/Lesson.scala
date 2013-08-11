@@ -9,7 +9,7 @@ case class Lesson(id: Long, name: String)
 
 case class Bilet(id: Long, lesson_id: Long, num: Int)
 
-case class Question(id: Long, bilet_id: Long, typ: Int, text: String, answer: Long)
+case class Question(id: Long, bilet_id: Long, typ: Int, text: String, image: String, answer: Long)
 
 case class Variant(id: Long, question_id: Long, text: String)
 
@@ -40,7 +40,7 @@ object Lesson {
 
   def findAll: Seq[Lesson] = {
     DB.withConnection { implicit connection =>
-      SQL("select * from Lessons").as(Lesson.simple *)
+      SQL("select * from Lessons order by id").as(Lesson.simple *)
     }
   }
 }
@@ -53,6 +53,15 @@ object Bilet {
       case id ~ lesson_id ~ num => Bilet(id, lesson_id, num)
     }
   }
+  
+  def exists(id: Long) = {
+    try{
+      Bilet.find(id)
+      true
+    }catch {
+     case _: Throwable => false 
+    }
+  }
 
   def find(id: Long): Bilet = {
     DB.withConnection(implicit connection =>
@@ -62,7 +71,7 @@ object Bilet {
 
   def inLesson(lesson_id: Long): List[Bilet] = {
     DB.withConnection(implicit connection => 
-      SQL("select * from Bilets where lesson_id={lesson_id}").on(
+      SQL("select * from Bilets where lesson_id={lesson_id} order by id").on(
 	'lesson_id -> lesson_id 
       ).as(Bilet.simple *)
     )
@@ -75,8 +84,9 @@ object Question {
       get[Int]("Questions.bilet_id") ~
       get[Int]("Questions.typ") ~ 
       get[String]("Questions.text") ~
+      get[String]("Questions.image")~
       get[Long]("Questions.answer") map {
-      case id ~ bilet_id ~ typ ~ text ~ answer => Question(id, bilet_id, typ, text, answer)
+	case id ~ bilet_id ~ typ ~ text ~ image ~ answer => Question(id, bilet_id, typ, text, image, answer)
     }
   }
 
@@ -85,13 +95,21 @@ object Question {
       SQL("select * from Questions where id={id}").on('id -> id).as(Question.simple.single)
     )
   }
+
+  def findByBilet(bilet_id: Long): List[Question] = {
+    DB.withConnection(implicit connection =>
+      SQL("select * from Questions where bilet_id={bilet_id} order by id").on(
+	'bilet_id -> bilet_id
+      ).as(Question.simple *)
+    )
+  }
 }
 
 object Variant {
   val simple = {
-    get[Int]("Variant.id") ~
-      get[Int]("Variant.question_id") ~
-      get[String]("Variant.text") map {
+    get[Int]("Variants.id") ~
+      get[Int]("Variants.question_id") ~
+      get[String]("Variants.text") map {
       case id ~ question_id ~ text => Variant(id, question_id, text)
     }
   }
@@ -99,6 +117,14 @@ object Variant {
   def find(id: Long): Variant = {
     DB.withConnection(implicit connection =>
       SQL("select * from Variants where id={id}").on('id -> id).as(Variant.simple.single)
+    )
+  }
+
+  def findByQuestion(question_id: Long): List[Variant] = {
+    DB.withConnection(implicit connection =>
+      SQL("select * from Variants where question_id={question_id} order by id").on(
+	'question_id -> question_id
+      ).as(Variant.simple *)
     )
   }
 }
