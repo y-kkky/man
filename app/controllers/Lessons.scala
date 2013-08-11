@@ -78,6 +78,8 @@ object Lessons extends Controller{
       result += s"""
       <br><input type='text' name='t${question.id}'/>
       """
+    } else if(question.typ==4){
+      result += s"${question.text}"
     }
     result += "</div><div id='line'></div>"
     result
