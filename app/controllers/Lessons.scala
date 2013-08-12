@@ -4,6 +4,7 @@ import play.api._
 import play.api.mvc._
 import models.Lesson
 import models.Bilet
+import models.Stat
 import models.BiletStat
 import models.Question
 import models.Variant
@@ -49,7 +50,10 @@ object Lessons extends Controller{
       NotFound(views.html.errors.onHandlerNotFound(request))*/
     // val bilet = Bilet.find(bilet_id)
     val questions = Question.findByBilet(bilet_id)
-    Ok(views.html.lessons.bilet(questions))
+    if(questions.isEmpty)
+      NotFound(views.html.errors.onHandlerNotFound(request))
+    else
+      Ok(views.html.lessons.bilet(questions, bilet_id))
   }
 
   def showQuestion(question: Question, number: Int) = {
@@ -66,7 +70,7 @@ object Lessons extends Controller{
       var varstring = ""
       val lis = split(variants, variants.length/2)
       for(variant <- lis(0)){
-	varstring += s"<tr><td align=right>${variant.text} ---- </td><td><select name='s${question.id}'><option disabled selected>Оберіть відповідь</option>"
+	varstring += s"<tr><td align=right>${variant.text} ---- </td><td><select name='${variant.id}s${question.id}'><option disabled selected>Оберіть відповідь</option>"
 	for(option <- lis(1))
 	  varstring += "<option>" + option.text + "</option>"
 	varstring += "</select></td><br>"
@@ -78,11 +82,48 @@ object Lessons extends Controller{
       result += s"""
       <br><input type='text' name='t${question.id}'/>
       """
-    } else if(question.typ==4){
-      result += s"${question.text}"
     }
     result += "</div><div id='line'></div>"
     result
+  }
+  
+  def parseQuestion = withUser {user => request =>
+    var ra = 0
+    var max = 0
+    val forma = request.body.asFormUrlEncoded
+    val bilet = Bilet.find((forma.get("bilet_id")(0)).toLong)
+    //if(Stat.exists(user.id, bilet.id)) 
+    Stat.deleteResolve(user.id, bilet.id)
+    val questions = Question.findByBilet(bilet.id)
+    for(question <- questions){
+      var answer = ""
+      var right = 0
+      if(question.typ==1){
+	answer = forma.get("f"+question.id)(0)
+	if(question.answer == answer) {ra+=1; right=1}
+	max += 1
+      }else if(question.typ==2){
+	val variants = Variant.findByQuestion(question.id)
+	val lis = split(variants, variants.length/2)
+	answer = ""
+	for(variant <- lis(0))
+	  answer += (forma.get(variant.id + "s" + question.id)(0)) + "~"
+	val right_answer = (question.answer).split("~")
+	val user_answer = answer.split("~")
+	val length = right_answer.length
+	for(i <- 0 to (length-1))
+	  if(right_answer(i)==user_answer(i)) ra += 1
+	max += length
+	if(ra == max) right = 1
+      }else if(question.typ==3){
+	answer = forma.get("t"+question.id)(0)
+	if(answer == question.answer) {ra += 2; right = 1}
+	max += 2
+      }
+      Stat.newStat(user.id, bilet.id, question.id, right, answer)
+    }
+    BiletStat.newBiletStat(user.id, bilet.id, ra, max)
+    Redirect(routes.Static.home)
   }
 
   def split[A](xs: List[A], n: Int): List[List[A]] = {

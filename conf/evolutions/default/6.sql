@@ -1,8 +1,8 @@
-# --- Sixth database schema
+# --- Eight database schema
 
 # --- !Ups
-INSERT INTO Questions (bilet_id, typ, text, image, answer) Values (1, 1, 'Pervii','http://www.iaf-messe.com/tl_files/pictures/firmenlogos/e/euk_logo.jpg', 1), (1, 2, 'Vtoroi', '', 2), (1, 3, 'Tretii', '', 2)
+INSERT INTO Users (regtime, email, name, city, school, comments, lessons, pass, rank) Values (111, 'yarik.just@gmail.com', 'Yarik', 'Niko', '2', 'comma', '123', 'C634AE0B9046D163A6E7E259A1AC49D70C5A88B5', 10)
 
 
 # --- !Downs
-DELETE FROM Questions
+DELETE FROM Users

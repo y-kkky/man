@@ -2,6 +2,10 @@ function otmena(){
     window.onbeforeunload = function(){
 	
     }
+    if(confirm("Ви впевнені, що хочете завершити розв'язання тесту?"))
+	return true;
+    else
+	return false;
 }
 
 function starter(){
@@ -24,7 +28,7 @@ function startTimer() {
 	    if (h == 0) {
 		window.onbeforeunload = function(){
 		}
-		document.getElementById("knop").click();
+		document.forms["test"].submit();
 		return;
 	    }
 	    h--;

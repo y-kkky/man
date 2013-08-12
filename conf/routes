@@ -39,3 +39,4 @@ GET         /lessons                     controllers.Lessons.allLessons
 GET         /lesson/:id                  controllers.Lessons.lesson(id: Long)
 GET	    /lesson/:id/preparation	 controllers.Lessons.prep(id: Long)
 GET	    /bilet/:id			 controllers.Lessons.bilet(id: Long)
+POST 	    /engine			 controllers.Lessons.parseQuestion

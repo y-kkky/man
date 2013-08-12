@@ -18,11 +18,10 @@ CREATE SEQUENCE question_id_seq;
 create table Questions (
   id 			    integer not null default nextval('question_id_seq') primary key,
   bilet_id    integer,
-  quest_type  integer,
   typ 	      integer,
   text        text,
   image       varchar,
-  answer      integer
+  answer      varchar
 );
 CREATE SEQUENCE variant_id_seq;
 create table Variants (
@@ -32,15 +31,16 @@ create table Variants (
 );
 create table Stat (
   user_id     integer,
-  lesson_id   integer,
   bilet_id    integer,
   question_id integer,
-  answer      integer
+  right	      integer,
+  answer      varchar
 );
 create table BiletStat (
   user_id    integer,
   bilet_id   integer,
-  perc	     integer
+  ra	     integer,
+  max	     integer
 )
 # --- !Downs
 drop table if exists Lessons;

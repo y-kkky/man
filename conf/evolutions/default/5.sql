@@ -1,7 +1,8 @@
-# --- BiletStat database schema
+# --- Sixth database schema
 
 # --- !Ups
-INSERT INTO BiletStat (user_id, bilet_id, perc) VALUES (1, 1, 70), (1, 2, 71), (1, 3, 71)
+INSERT INTO Questions (bilet_id, typ, text, image, answer) Values (1, 1, 'Pervii','http://www.iaf-messe.com/tl_files/pictures/firmenlogos/e/euk_logo.jpg', 'hello'), (1, 2, 'Vtoroi', '', '2 first~2 second'), (1, 3, 'Tretii', '', 'python')
+
 
 # --- !Downs
-DELETE FROM BiletStat
+DELETE FROM Questions
