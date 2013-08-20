@@ -2,6 +2,8 @@ package controllers
 
 import play.api._
 import play.api.mvc._
+import play.api.data._
+import play.api.data.Forms._
 import models.Lesson
 import models.Bilet
 import models.Stat
@@ -125,6 +127,67 @@ object Lessons extends Controller{
     BiletStat.newBiletStat(user.id, bilet.id, ra, max)
     Redirect(routes.Static.home)
   }
+  
+  // Подгрузка билетов 
+  //------------------------------------------------------------
+  def getLoad = withUser { user => implicit request =>
+    if(user.id != 1) Redirect(routes.Static.home)
+    else Ok(views.html.lessons.load("Upload"))
+  }
+
+  def postLoad = Action(parse.multipartFormData) { request =>
+    request.body.file("xml").map { xm =>
+      import java.io.File
+      val time = System.currentTimeMillis
+      xm.ref.moveTo(new File("/tmp/xml/" + time + ".xml"))
+      val xmll = scala.xml.XML.loadFile("/tmp/xml/"+ time + ".xml")
+      parseBilet(xmll)
+      Redirect(routes.Lessons.getLoad).flashing(
+	"success" -> "File was uploaded"
+      )
+    }.getOrElse{
+      Redirect(routes.Lessons.getLoad).flashing(
+	"error" -> "Missing file"
+      )
+    }
+  }
+  
+  // Функция парсит xml документ и создает билет
+  def parseBilet(data: scala.xml.Elem){
+    // Шаг первый. Получаем id предмета
+    val lesson_id = ((data \ "@lesson_id").text).toInt
+    // Создаем билет
+    Bilet.create(lesson_id)
+    val lastBilet = Bilet.getLast
+    // Шаг третий. Проходимся по всем вопросам
+    for (question <- (data \\ "question")){
+      // Получаем тип вопроса
+      val typ = ((question \ "@type").text).toInt
+      // Не зависимо от вопроса получаем картинку и текст вопроса
+      val text = (question \\ "text").text
+      val image = (question \\ "image").text
+      var right = ""
+      val thisQuestId =((Question.getLast).id + 1)
+      // В зависимости от типа по разному обрабатываем вопросы
+      if(typ == 1 || typ == 2){
+	// Получаем правильный ответ
+	if(typ == 1)
+	  right = (question \\ "variant")(((question \ "@right").text).toInt).text
+	else if(typ == 2){
+	  val massive = for(variant <- (question \\ "variant"); if((variant \ "@answer").text == "true")) yield variant.text
+	  for(mas <- massive) right+= mas+"~"
+	}
+	// Получаем варианты
+	val variants = for(variant <- (question \\ "variant")) yield variant.text
+	for(variant <- variants)
+	  Variant.create(thisQuestId, variant)
+      }else if(typ == 3){
+	right = (question \\ "right").text
+      } 
+      Question.create(lastBilet.id, typ, text, image, right)
+    }
+  }
+  
 
   def split[A](xs: List[A], n: Int): List[List[A]] = {
     if (xs.size <= n) xs :: Nil

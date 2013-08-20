@@ -1,0 +1,28 @@
+@(title: String)(implicit flash: Flash)
+@import helper._
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>@title</title>
+</head>
+<body>
+  @flash.get("error").map { message =>
+    <p style="color: red;"> @message</p>
+  }
+
+  @flash.get("success").map { message =>
+    <p style="color: green;"> @message</p>
+  }
+
+@helper.form(action = routes.Lessons.postLoad, 'enctype -> "multipart/form-data") {
+    
+    <input type="file" name="xml">
+    
+    <p>
+        <input type="submit">
+    </p>
+    
+}
+</body>
+</html>

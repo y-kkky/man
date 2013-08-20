@@ -11,8 +11,7 @@ create table Lessons (
 CREATE SEQUENCE bilet_id_seq;
 create table Bilets (
   id 			    integer not null default nextval('bilet_id_seq') primary key,
-  lesson_id   integer,
-  num         int
+  lesson_id   integer
 );
 CREATE SEQUENCE question_id_seq;
 create table Questions (

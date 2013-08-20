@@ -7,7 +7,7 @@ import anorm.SqlParser._
 
 case class Lesson(id: Long, name: String)
 
-case class Bilet(id: Long, lesson_id: Long, num: Int)
+case class Bilet(id: Long, lesson_id: Long)
 
 case class Question(id: Long, bilet_id: Long, typ: Int, text: String, image: String, answer: String)
 
@@ -48,9 +48,8 @@ object Lesson {
 object Bilet {
   val simple = {
     get[Int]("Bilets.id") ~
-      get[Int]("Bilets.lesson_id") ~
-      get[Int]("Bilets.num") map {
-      case id ~ lesson_id ~ num => Bilet(id, lesson_id, num)
+      get[Int]("Bilets.lesson_id") map {
+      case id ~ lesson_id => Bilet(id, lesson_id)
     }
   }
   
@@ -67,6 +66,20 @@ object Bilet {
     DB.withConnection(implicit connection =>
       SQL("select * from Bilets where id={id}").on('id -> id).as(Bilet.simple.single)
     )
+  }
+
+  def create(lesson_id: Long) = {
+    DB.withConnection(implicit connection =>
+      SQL("insert into Bilets (lesson_id) VALUES ({lesson_id})").on(
+	'lesson_id -> lesson_id
+      ).executeUpdate()
+    )
+  }
+
+  def getLast: Bilet = {
+    DB.withConnection(implicit conneciton =>
+      SQL("select * from Bilets ORDER BY id DESC LIMIT 1").as(Bilet.simple.single)
+		    )
   }
 
   def inLesson(lesson_id: Long): List[Bilet] = {
@@ -88,6 +101,24 @@ object Question {
       get[String]("Questions.answer") map {
 	case id ~ bilet_id ~ typ ~ text ~ image  ~  answer => Question(id, bilet_id, typ, text, image, answer)
     }
+  }
+
+  def create(bilet_id: Long, typ: Int, text: String, image: String, answer: String) = {
+    DB.withConnection(implicit connection =>
+      SQL("insert into Questions (bilet_id, typ, text, image, answer) VALUES ({bilet_id}, {typ}, {text}, {image}, {answer})").on(
+	'bilet_id -> bilet_id,
+	'typ -> typ,
+	'text -> text,
+	'image -> image,
+	'answer -> answer
+      ).executeUpdate()
+		    )
+  }
+
+  def getLast: Question = {
+    DB.withConnection(implicit conneciton =>
+      SQL("select * from Questions ORDER BY id DESC LIMIT 1").as(Question.simple.single)
+		    )
   }
 
   def find(id: Long): Question = {
@@ -112,6 +143,15 @@ object Variant {
       get[String]("Variants.text") map {
       case id ~ question_id ~ text => Variant(id, question_id, text)
     }
+  }
+  
+  def create(question_id: Long, text: String) = {
+    DB.withConnection(implicit connection =>
+      SQL("insert into Variants (question_id, text) VALUES ({question_id}, {text})").on(
+	'question_id -> question_id,
+	'text -> text
+      ).executeUpdate()
+		    )
   }
 
   def find(id: Long): Variant = {
