@@ -11,7 +11,8 @@ create table Lessons (
 CREATE SEQUENCE bilet_id_seq;
 create table Bilets (
   id 			    integer not null default nextval('bilet_id_seq') primary key,
-  lesson_id   integer
+  lesson_id   integer,
+  time	      varchar
 );
 CREATE SEQUENCE question_id_seq;
 create table Questions (
@@ -32,14 +33,14 @@ create table Stat (
   user_id     integer,
   bilet_id    integer,
   question_id integer,
-  right	      integer,
+  right_a     integer,
   answer      varchar
 );
 create table BiletStat (
   user_id    integer,
   bilet_id   integer,
   ra	     integer,
-  max	     integer
+  max_a	     integer
 )
 # --- !Downs
 drop table if exists Lessons;

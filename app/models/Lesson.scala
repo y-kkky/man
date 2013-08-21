@@ -7,7 +7,7 @@ import anorm.SqlParser._
 
 case class Lesson(id: Long, name: String)
 
-case class Bilet(id: Long, lesson_id: Long)
+case class Bilet(id: Long, lesson_id: Long, time: String)
 
 case class Question(id: Long, bilet_id: Long, typ: Int, text: String, image: String, answer: String)
 
@@ -48,8 +48,9 @@ object Lesson {
 object Bilet {
   val simple = {
     get[Int]("Bilets.id") ~
-      get[Int]("Bilets.lesson_id") map {
-      case id ~ lesson_id => Bilet(id, lesson_id)
+      get[Int]("Bilets.lesson_id") ~ 
+      get[String]("Bilets.time") map {
+      case id ~ lesson_id ~ time => Bilet(id, lesson_id, time)
     }
   }
   
@@ -64,14 +65,15 @@ object Bilet {
 
   def find(id: Long): Bilet = {
     DB.withConnection(implicit connection =>
-      SQL("select * from Bilets where id={id}").on('id -> id).as(Bilet.simple.single)
+      SQL("select * from Bilets where id={id} order by id").on('id -> id).as(Bilet.simple.single)
     )
   }
 
-  def create(lesson_id: Long) = {
+  def create(lesson_id: Long, time: String) = {
     DB.withConnection(implicit connection =>
-      SQL("insert into Bilets (lesson_id) VALUES ({lesson_id})").on(
-	'lesson_id -> lesson_id
+      SQL("insert into Bilets (lesson_id, time) VALUES ({lesson_id}, {time})").on(
+	'lesson_id -> lesson_id,
+	'time -> time
       ).executeUpdate()
     )
   }
@@ -123,7 +125,7 @@ object Question {
 
   def find(id: Long): Question = {
     DB.withConnection(implicit connection =>
-      SQL("select * from Questions where id={id}").on('id -> id).as(Question.simple.single)
+      SQL("select * from Questions where id={id} order by id").on('id -> id).as(Question.simple.single)
     )
   }
 
@@ -174,7 +176,7 @@ object Stat {
     get[Long]("Stat.user_id") ~
     get[Long]("Stat.bilet_id") ~
     get[Long]("Stat.question_id") ~
-    get[Int]("Stat.right") ~
+    get[Int]("Stat.right_a") ~
     get[String]("Stat.answer") map {
       case user_id ~ bilet_id ~ question_id ~ right ~ answer =>
 	Stat(user_id, bilet_id, question_id, right, answer)
@@ -183,7 +185,7 @@ object Stat {
   
   def newStat(user_id: Long, bilet_id: Long, question_id: Long, right: Int, answer: String) = {
     DB.withConnection(implicit connection =>
-      SQL("INSERT INTO Stat (user_id, bilet_id, question_id, right, answer) VALUES ({user_id}, {bilet_id}, {question_id}, {right}, {answer})").on(
+      SQL("INSERT INTO Stat (user_id, bilet_id, question_id, right_a, answer) VALUES ({user_id}, {bilet_id}, {question_id}, {right}, {answer})").on(
 	'user_id -> user_id,
 	'bilet_id -> bilet_id,
 	'question_id -> question_id,
@@ -195,7 +197,7 @@ object Stat {
 
   def find(user_id: Long, bilet_id: Long) = {
     DB.withConnection(implicit connection => 
-      SQL("select * from Stat where user_id={user_id} and bilet_id={bilet_id}").on(
+      SQL("select * from Stat where user_id={user_id} and bilet_id={bilet_id} order by question_id").on(
 	'user_id -> user_id,
 	'bilet_id -> bilet_id
       ).as(Stat.simple *)
@@ -229,14 +231,14 @@ object BiletStat {
     get[Long]("BiletStat.user_id") ~ 
     get[Long]("BiletStat.bilet_id") ~ 
     get[Int]("BiletStat.ra") ~
-    get[Int]("BiletStat.max") map {
+    get[Int]("BiletStat.max_a") map {
       case user_id ~ bilet_id ~ ra ~ max => BiletStat(user_id , bilet_id , ra, max) 
     }
   }
   
   def newBiletStat(user_id: Long, bilet_id: Long, ra: Int, max: Int) = {
     DB.withConnection(implicit connection =>
-      SQL("insert into BiletStat (user_id, bilet_Id, ra, max) VALUES ({user_id}, {bilet_id}, {ra}, {max})").on(
+      SQL("insert into BiletStat (user_id, bilet_id, ra, max_a) VALUES ({user_id}, {bilet_id}, {ra}, {max})").on(
 	'user_id -> user_id,
 	'bilet_id -> bilet_id,
 	'ra -> ra,

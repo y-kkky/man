@@ -96,7 +96,8 @@ object User extends Controller with Secured {
 
               З повагою, Ярослав Круковський.
             """)
-            Redirect(routes.Static.home).flashing(
+	    val id = mUser.findByEmail(user._1).id
+            Redirect(routes.User.profile(id)).withSession(Security.username -> user._1, "id" -> id.toString).flashing(
               "success" -> "Ви були успішно зареєстровані")
           }
         })

@@ -52,38 +52,90 @@ object Lessons extends Controller{
       NotFound(views.html.errors.onHandlerNotFound(request))*/
     // val bilet = Bilet.find(bilet_id)
     val questions = Question.findByBilet(bilet_id)
+    val time = (Bilet.find(bilet_id)).time
     if(questions.isEmpty)
       NotFound(views.html.errors.onHandlerNotFound(request))
-    else
-      Ok(views.html.lessons.bilet(questions, bilet_id))
+    else {
+      val shuffled = util.Random.shuffle(questions)
+      Ok(views.html.lessons.bilet(shuffled, bilet_id, time))
+    }
+  }
+
+  def biletStat(bilet_id: Long) = withUser{ user => implicit request =>
+    val questions = Question.findByBilet(bilet_id)
+    val stat = Stat.find(user.id, bilet_id)
+    if(questions.isEmpty || stat.isEmpty)
+      NotFound(views.html.errors.onHandlerNotFound(request))
+    else{
+      Ok(views.html.lessons.biletstat(questions, bilet_id, stat))
+    }
   }
 
   def showQuestion(question: Question, number: Int) = {
-    var result = s"""<div id='question'>${number+1}. ${question.text}<br>
-    <img src='${question.image}'/>"""
+    var result = s"""<div id='question'>${number+1}. ${question.text}<br><img src='${question.image}'/>"""
     val variants = Variant.findByQuestion(question.id)
     if(question.typ==1){
       var varstring = ""
-      for(variant <- variants) varstring += s"<input type='radio' name='f${question.id}' value='${variant.text}'>${variant.text}</input><br>"
+      val shuffled = util.Random.shuffle(variants)
+      for(variant <- shuffled) varstring += s"<input type='radio' name='f${question.id}' value='${variant.text}'>${variant.text}</input><br>"
       result += s"""
       <br>$varstring
       """
     }else if(question.typ==2){
+      result = s"""<div id='question'>${number+1}. ${question.text}
+<img src='${question.image}'/>"""
       var varstring = ""
       val lis = split(variants, variants.length/2)
+      val shuffled = util.Random.shuffle(lis(1))
       for(variant <- lis(0)){
 	varstring += s"<tr><td align=right>${variant.text} ---- </td><td><select name='${variant.id}s${question.id}'><option disabled selected>Оберіть відповідь</option>"
-	for(option <- lis(1))
+	for(option <- shuffled)
 	  varstring += "<option>" + option.text + "</option>"
 	varstring += "</select></td><br>"
       }
-      result += s"""
-      <table>$varstring</table>
-      """
+      result += s"<table>$varstring</table>"
     }else if(question.typ==3){
       result += s"""
       <br><input type='text' name='t${question.id}'/>
       """
+    }
+    result += "</div><div id='line'></div>"
+    result
+  }
+
+  def showQuestionStat(question: Question, number: Int, stat: Stat) = {
+    var result = ""
+    if(question.image!="")
+      result = s"""<div id='questionstat' class='well'>${number+1}. ${question.text}<br><img src='${question.image}'/>"""
+    else 
+      result = s"""<div id='questionstat' class='well'>${number+1}. ${question.text}"""
+    val variants = Variant.findByQuestion(question.id)
+    if(question.typ == 1 || question.typ == 3){
+      result += "<p>Правильна відповідь: " + question.answer + "</p><p>Ваша відповідь: "
+      if(stat.right==1)
+	result+="<span style='color: green;'>"
+      else
+	result+="<span style='color: red;'>"
+      result += stat.answer
+      result += "</span></p>"
+    }else if(question.typ==2){
+      result = s"""<div id='question' class='well'>${number+1}. ${question.text}
+<img src='${question.image}'/>"""
+      var varstring = ""
+      val lis = split(variants, variants.length/2)
+      val right_answer = (question.answer).split("~")
+      val user_answer = (stat.answer).split("~")
+      val length = user_answer.length
+      var color = ""
+      for(i <- 0 to (length-1)){
+	if(user_answer(i)==right_answer(i))
+	  color = "green"
+	else
+	  color = "red"
+	varstring += s"<tr><td align=right><font color="+color+ s">${(lis(0))(i).text} ---- </font></td><td>"
+	varstring += s"<font color=${color}>${user_answer(i)}</font></td></tr><br>"
+      }
+      result += s"<table>$varstring</table>"
     }
     result += "</div><div id='line'></div>"
     result
@@ -101,15 +153,24 @@ object Lessons extends Controller{
       var answer = ""
       var right = 0
       if(question.typ==1){
-	answer = forma.get("f"+question.id)(0)
-	if(question.answer == answer) {ra+=1; right=1}
+	try{
+	  answer = forma.get("f"+question.id)(0)
+	  if(question.answer == answer) {ra+=1; right=1}
+	}catch {
+	  case _: Throwable => answer = "none"
+	}
 	max += 1
       }else if(question.typ==2){
 	val variants = Variant.findByQuestion(question.id)
 	val lis = split(variants, variants.length/2)
 	answer = ""
-	for(variant <- lis(0))
-	  answer += (forma.get(variant.id + "s" + question.id)(0)) + "~"
+	for(variant <- lis(0)){
+	  try{
+	    answer += (forma.get(variant.id + "s" + question.id)(0)) + "~"
+	  }catch {
+	    case _: Throwable => answer += "none~"
+	  }
+	}
 	val right_answer = (question.answer).split("~")
 	val user_answer = answer.split("~")
 	val length = right_answer.length
@@ -125,7 +186,15 @@ object Lessons extends Controller{
       Stat.newStat(user.id, bilet.id, question.id, right, answer)
     }
     BiletStat.newBiletStat(user.id, bilet.id, ra, max)
-    Redirect(routes.Static.home)
+    val perc = (ra*100)/max
+    if(perc>70)
+      Redirect(routes.Lessons.biletStat(bilet.id)).flashing(
+	"success" -> s"Зараховано! Ви набрали ${perc}%." 
+      )
+    else
+      Redirect(routes.Lessons.biletStat(bilet.id)).flashing(
+	"error" -> "Не зараховано :(. Ви набрали ${perc}%."
+      )
   }
   
   // Подгрузка билетов 
@@ -156,8 +225,9 @@ object Lessons extends Controller{
   def parseBilet(data: scala.xml.Elem){
     // Шаг первый. Получаем id предмета
     val lesson_id = ((data \ "@lesson_id").text).toInt
+    val time = ((data \ "@time").text)
     // Создаем билет
-    Bilet.create(lesson_id)
+    Bilet.create(lesson_id, time)
     val lastBilet = Bilet.getLast
     // Шаг третий. Проходимся по всем вопросам
     for (question <- (data \\ "question")){
