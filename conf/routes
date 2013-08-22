@@ -45,3 +45,7 @@ GET 	    /bilet/:id/stat			 controllers.Lessons.biletStat(id: Long)
 # uhaha route
 GET         /load			 controllers.Lessons.getLoad
 POST	    /loadengine			 controllers.Lessons.postLoad
+
+# daily challenge
+GET	    /daily			 controllers.Lessons.daily
+POST	    /dailyengine		 controllers.Lessons.dailyEngine

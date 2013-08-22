@@ -1,0 +1,18 @@
+@(questions: List[Question], bilet_id: Long, time: String)(implicit request: play.api.mvc.Request[Any])
+@import layouts._
+@import controllers.Lessons
+@import models.mUser
+@test("Щоденне змагання") {
+  <form id="test" action="@routes.Lessons.parseQuestion" method="POST">
+  <!-- what is it? --> 
+
+  <!-- omg &nbsp;--><!-- unknown error --> <!-- it`s a yellow submarine --> <!-- Brevity is the soul of wit. --> <!-- Two things are infinite: the universe and human stupidity; and I'm not sure about the universe. Albert Einstein --><input type="text" name="bilet_id" id="bilet_id" value="@bilet_id"/>
+  @for(question <- questions.zipWithIndex){
+    @Html(Lessons.showQuestion(question._1, question._2))
+  }
+  <div id="right">
+    <span id="timer">@time</span>
+    <input type="submit" value="Завершити" id="end" onclick="return otmena();">
+  </div>
+  </form>
+}

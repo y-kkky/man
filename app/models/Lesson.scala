@@ -15,6 +15,10 @@ case class Variant(id: Long, question_id: Long, text: String)
 
 case class Stat(user_id: Long, bilet_id: Long, question_id: Long, right: Int, answer: String)
 
+case class DailyStat(user_id: Long, question_id: Long, right: Int, answer: String)
+
+case class microDailyStat(user_id: Long, time: String, score: Long)
+
 case class BiletStat(user_id: Long, bilet_id: Long, ra: Int, max: Int)
 
 object Lesson {
@@ -136,6 +140,17 @@ object Question {
       ).as(Question.simple *)
     )
   }
+
+  // Генерит рандомные вопросы
+  def random(typ: Int, bilet_id: Long) = {
+    DB.withConnection(implicit connection =>
+      SQL("select * from Questions where typ={typ} and bilet_id={bilet_id} order by rand() limit 1").on(
+	'typ -> typ,
+	'bilet_id -> bilet_id
+      ).as(Question.simple.single)
+    )
+  }
+
 }
 
 object Variant {
@@ -226,6 +241,37 @@ object Stat {
 
 } 
 
+object DailyStat {
+  val simple = {
+    get[Long]("DailyStat.user_id") ~ 
+    get[Long]("DailyStat.question_id") ~ 
+    get[Int]("DailyStat.right_a") ~
+    get[Int]("BiletStat.answer") map {
+      case user_id ~ question_id ~ right ~ answer => BiletStat(user_id , question_id, right, answer) 
+    }
+  }
+  
+  def newDailyStat(user_id: Long, question_id: Long, right: Int, answer: String) = {
+    DB.withConnection(implicit connection=>
+       SQL("insert into DailyStat (user_id, question_id, right_a, answer) VALUES ({user_id,}, {question_id}, {right}, {answer})").on(
+	 'user_id -> user_id,
+	 'question_id -> question_id,
+	 'right -> right,
+	 'answer -> answer
+       ).executeUpdate()
+    )
+  }
+
+  def find(user_id: Long, question_id: Long) = {
+    DB.withConnection(implicit connection => 
+      SQL("select * from DailyStat where user_id={user_id} and question_id={question_id}").on(
+	'user_id -> user_id,
+	'question_id -> question_id
+      ).as(Stat.simple.single)
+    )
+  }
+}
+
 object BiletStat {
   val simple = {
     get[Long]("BiletStat.user_id") ~ 
@@ -266,4 +312,34 @@ object BiletStat {
     val perc = (bilStat.ra*100)/max
     if(perc > 70) true else false
   }
+}
+
+object microDailyStat {
+  val simple = {
+    get[Long]("mircoDailyStat.user_id") ~ 
+    get[String]("mircoDailyStat.curr_time") ~ 
+    get[Long]("mircoDailyStat.score") map {
+      case user_id ~ time ~ score => microDailyStat(user_id, time, score) 
+    }
+  }
+  
+  def create(user_id: Long, time: String, score: Long) = {
+    DB.withConnection(implicit connection =>
+      SQL("insert into microDailyStat (user_id, curr_time, score) VALUES ({user_id}, {time}, {score})").on(
+	'user_id -> user_id,
+	'time -> time,
+	'score -> score
+      ).executeUpdate()
+    )
+  }
+
+  def getByTime(user_id: Long, time: String): List[microDailyStat] = {
+    DB.withConnection(implicit connection =>
+      SQL("select * from mircoDailyStat where user_id={user_id} and curr_time={time}").on(
+	'user_id -> user_id,
+	'time -> time
+      ).as(microDailyStat.simple *)
+    )
+  }
+
 }

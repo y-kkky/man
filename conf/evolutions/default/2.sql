@@ -41,15 +41,28 @@ create table BiletStat (
   bilet_id   integer,
   ra	     integer,
   max_a	     integer
+);
+create table DailyStat (
+ user_id     integer,
+ question_id integer,
+ right_a     integer,
+ answer	     varchar
+);
+create table mircoDailyStat (
+ user_id     integer,
+ curr_time   varchar,
+ score	     integer
 )
 # --- !Downs
 drop table if exists Lessons;
-DROP SEQUENCE lesson_seq_id;
+DROP SEQUENCE lesson_id_seq;
 drop table if exists Bilets;
-DROP SEQUENCE bilet_seq_id;
+DROP SEQUENCE bilet_id_seq;
 drop table if exists Questions;
-DROP SEQUENCE question_seq_id;
+DROP SEQUENCE question_id_seq;
 drop table if exists Variants;
-DROP SEQUENCE variant_seq_id;
+DROP SEQUENCE variant_id_seq;
 drop table if exists Stat;
 drop table if exists BiletStat;
+drop table if exists DailyStat;
+drop table if exists microDailyStat;

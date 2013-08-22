@@ -1,7 +1,21 @@
 @()(implicit request: play.api.mvc.Request[Any])
 @import layouts._
-@main("Зворотній зв'язок") {
+@main("Зворотний зв'язок") {
 <div class="center hero-unit">
-	<h1>Мої дані:</h1>
+	<h1>Зворотний зв'язок:</h1>
+	<table align=center style="font-size: 20px;">
+	  <tr>
+	    <td align=right style="color: green;">Електронна пошта:&nbsp;</td>
+	    <td align=left>yarik.just&#64;gmail.com</td>
+	  </tr>
+	  <tr>
+	    <td align=right style="color: green;">Skype:&nbsp;</td>
+	    <td align=left>icejust</td>
+	  </tr>
+	  <tr>
+	    <td align=right style="color: green;">vk.com:&nbsp;</td>
+	    <td align=left>Вкажіть у полі <a href="http://vk.com/im?sel=-3" target="_blank">одержувач</a> email: yarik.just&#64;gmail.com</td>
+	  </tr>
+	</table>
 </div>
 }

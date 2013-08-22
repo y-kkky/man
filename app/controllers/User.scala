@@ -17,16 +17,16 @@ object User extends Controller with Secured {
   // Формы (для входа, регистрации, редактирования профиля и восстановления пароля)
   val loginForm = Form(
     tuple(
-      "email" -> nonEmptyText(5, 50),
+      "email" -> email,
       "password" -> nonEmptyText) verifying("Невірна пошта або пароль", result => result match {
       case (email, pass) => mUser.authenticate(email, pass).isDefined
     }))
 
   val registerForm = Form(
     tuple(
-      "email" -> nonEmptyText,
-      "name" -> nonEmptyText,
-      "password" -> nonEmptyText,
+      "email" -> email,
+      "name" -> nonEmptyText(8, 100),
+      "password" -> nonEmptyText(6, 100),
       "confirm" -> nonEmptyText) verifying("Користувач з такою поштою вже зареєстрований", result => result match {
       case (email, name, password, confirm) => mUser.checkUser(email)
     })
@@ -44,7 +44,7 @@ object User extends Controller with Secured {
       "comments" -> text))
 
   val recoverForm = Form(
-    "email" -> nonEmptyText.verifying ("Немає користувача з такою поштою", result => result match {
+    "email" -> email.verifying ("Немає користувача з такою поштою", result => result match {
       case email => !mUser.checkUser(email)
     })
   )

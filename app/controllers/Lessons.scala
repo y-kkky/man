@@ -4,12 +4,7 @@ import play.api._
 import play.api.mvc._
 import play.api.data._
 import play.api.data.Forms._
-import models.Lesson
-import models.Bilet
-import models.Stat
-import models.BiletStat
-import models.Question
-import models.Variant
+import models._
 import controllers.User.withUser
 
 object Lessons extends Controller{
@@ -111,13 +106,19 @@ object Lessons extends Controller{
       result = s"""<div id='questionstat' class='well'>${number+1}. ${question.text}"""
     val variants = Variant.findByQuestion(question.id)
     if(question.typ == 1 || question.typ == 3){
-      result += "<p>Правильна відповідь: " + question.answer + "</p><p>Ваша відповідь: "
-      if(stat.right==1)
-	result+="<span style='color: green;'>"
-      else
-	result+="<span style='color: red;'>"
-      result += stat.answer
-      result += "</span></p>"
+      if(stat.answer == "none" || stat.answer == ""){
+	result += "<p>Правильна відповідь: " + question.answer + "</p>"
+	result += "<p>Ви не відповідали на це питання.</p>"
+      }
+      else{
+	result += "<p>Правильна відповідь: " + question.answer + "</p><p>Ваша відповідь: "
+	if(stat.right==1)
+	  result+="<span style='color: green;'>"
+	else
+	  result+="<span style='color: red;'>"
+	result += stat.answer
+	result += "</span></p>"
+	}
     }else if(question.typ==2){
       result = s"""<div id='question' class='well'>${number+1}. ${question.text}
 <img src='${question.image}'/>"""
@@ -133,7 +134,13 @@ object Lessons extends Controller{
 	else
 	  color = "red"
 	varstring += s"<tr><td align=right><font color="+color+ s">${(lis(0))(i).text} ---- </font></td><td>"
-	varstring += s"<font color=${color}>${user_answer(i)}</font></td></tr><br>"
+	if(user_answer(i)=="none")
+	  varstring += s"<font color=${color}>Ви не відповіли.</font></td><td>(Правильно - ${(lis(1))(i).text})</td></tr><br>"
+	else
+	  if(user_answer(i)==right_answer(i))
+	    varstring += s"<font color=${color}>${user_answer(i)}</font></td></tr><br>"
+	  else
+	    varstring += s"<font color=${color}>${user_answer(i)}</font></td><td>(Правильно - ${(lis(1))(i).text})</td></tr><br>"
       }
       result += s"<table>$varstring</table>"
     }
@@ -193,8 +200,122 @@ object Lessons extends Controller{
       )
     else
       Redirect(routes.Lessons.biletStat(bilet.id)).flashing(
-	"error" -> "Не зараховано :(. Ви набрали ${perc}%."
+	"error" -> s"Не зараховано :(. Ви набрали ${perc}%."
       )
+  }
+
+  // Ежедневное соревнование
+  def daily = withUser { user => implicit request =>
+    // Шаг первый: проверяем, не проходил ли принимал ли участие пользователь сегодня в ежедневке
+    import java.util.Calendar
+    import java.text.SimpleDateFormat
+    val today = Calendar.getInstance().getTime()
+    val formatter = new SimpleDateFormat("YYYY:MM:dd")
+    val current_day = formatter.format(today)
+    val microStat =  microDailyStat.getByTime(user.id, current_day)
+    //Текущий день уже есть. Найдем предметы юзера
+    val lessons = User.codeToLessonsList(user.lessons)
+    //Предметы есть. Теперь создадим список id Доступных предметов
+    var biletIds: List[Long] = List()
+    import scala.util.Random
+    val rand = new Random()
+    if(lessons.length < 3){
+      Redirect(routes.User.edit).flashing(
+	"error" -> "Для участі в щоденних змаганнях оберіть щонайменше 3 предмети."
+      )
+    }else{
+      for(lesson <- lessons){
+	for(bilet <- Bilet.inLesson(lesson.id))
+	  biletIds ::= bilet.id
+      }
+      biletIds = rand.shuffle(biletIds)
+      var question: Question = null
+      if(microStat.length == 0){
+	//Генерируем рандомные вопросы
+	var randQuests: List[Question] = List()
+	if(biletIds.length != 0 && randQuests.length == 18){
+	  for(i <- 1 to 3){
+	    for(b <- 1 to 6)
+              question = Question.random(1, biletIds(rand.nextInt(biletIds.length)))
+	    while(randQuests.contains(question)){
+              question = Question.random(i, biletIds(rand.nextInt(biletIds.length)))
+	    }
+	    randQuests = randQuests :+ question
+	  }
+	  randQuests = rand.shuffle(randQuests)
+	  // ВАЖНО!!!
+	  // Вот тут успешный результат получения рандомных вопросов
+	  Ok(randQuests.length.toString)
+	}else if(randQuests.length != 18){
+	  Redirect(routes.Static.home).flashing(
+	    "error" -> "Для обраних вами предметів недостатньо питань"
+	  )
+	}else{
+	  Redirect(routes.Static.home).flashing(
+	    "error" -> "Для обраних вами предметів недостатньо білетів"
+	  )
+	}
+      }else
+	Redirect(routes.Static.home).flashing(
+	  "error" -> "Ви вже приймали сьогдні участь у щоденному змаганні."
+	)
+    }
+		      }
+
+  // Вспомогательная функция, опредетяет, записано ли в масиве уже значение
+
+  def dailyEngine = withUser {user => request =>
+   /* var ra = 0
+    var max = 0
+    val forma = request.body.asFormUrlEncoded
+    val questions = Question.findByBilet(bilet.id)
+    for(question <- questions){
+      var answer = ""
+      var right = 0
+      if(question.typ==1){
+	try{
+	  answer = forma.get("f"+question.id)(0)
+	  if(question.answer == answer) {ra+=1; right=1}
+	}catch {
+	  case _: Throwable => answer = "none"
+	}
+	max += 1
+      }else if(question.typ==2){
+	val variants = Variant.findByQuestion(question.id)
+	val lis = split(variants, variants.length/2)
+	answer = ""
+	for(variant <- lis(0)){
+	  try{
+	    answer += (forma.get(variant.id + "s" + question.id)(0)) + "~"
+	  }catch {
+	    case _: Throwable => answer += "none~"
+	  }
+	}
+	val right_answer = (question.answer).split("~")
+	val user_answer = answer.split("~")
+	val length = right_answer.length
+	for(i <- 0 to (length-1))
+	  if(right_answer(i)==user_answer(i)) ra += 1
+	max += length
+	if(ra == max) right = 1
+      }else if(question.typ==3){
+	answer = forma.get("t"+question.id)(0)
+	if(answer == question.answer) {ra += 2; right = 1}
+	max += 2
+      }
+      Stat.newStat(user.id, bilet.id, question.id, right, answer)
+    }
+    BiletStat.newBiletStat(user.id, bilet.id, ra, max)
+    val perc = (ra*100)/max
+    if(perc>70)
+      Redirect(routes.Lessons.biletStat(bilet.id)).flashing(
+	"success" -> s"Зараховано! Ви набрали ${perc}%." 
+      )
+    else
+      Redirect(routes.Lessons.biletStat(bilet.id)).flashing(
+	"error" -> s"Не зараховано :(. Ви набрали ${perc}%."
+      )*/
+    Redirect(routes.Static.home)
   }
   
   // Подгрузка билетов 
