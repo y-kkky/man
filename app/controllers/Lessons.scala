@@ -207,16 +207,11 @@ object Lessons extends Controller{
   // Ежедневное соревнование
   def daily = withUser { user => implicit request =>
     // Шаг первый: проверяем, не проходил ли принимал ли участие пользователь сегодня в ежедневке
-    import java.util.Calendar
-    import java.text.SimpleDateFormat
-    val today = Calendar.getInstance().getTime()
-    val formatter = new SimpleDateFormat("YYYY:MM:dd")
-    val current_day = formatter.format(today)
-    val microStat =  microDailyStat.getByTime(user.id, current_day)
+    val current_day = currentDate
     //Текущий день уже есть. Найдем предметы юзера
     val lessons = User.codeToLessonsList(user.lessons)
     //Предметы есть. Теперь создадим список id Доступных предметов
-    var biletIds: List[Long] = List()
+    var questionsAllowed: List[Question] = List()
     import scala.util.Random
     val rand = new Random()
     if(lessons.length < 3){
@@ -225,50 +220,66 @@ object Lessons extends Controller{
       )
     }else{
       for(lesson <- lessons){
-	for(bilet <- Bilet.inLesson(lesson.id))
-	  biletIds ::= bilet.id
-      }
-      biletIds = rand.shuffle(biletIds)
-      var question: Question = null
-      if(microStat.length == 0){
-	//Генерируем рандомные вопросы
-	var randQuests: List[Question] = List()
-	if(biletIds.length != 0 && randQuests.length == 18){
-	  for(i <- 1 to 3){
-	    for(b <- 1 to 6)
-              question = Question.random(1, biletIds(rand.nextInt(biletIds.length)))
-	    while(randQuests.contains(question)){
-              question = Question.random(i, biletIds(rand.nextInt(biletIds.length)))
-	    }
-	    randQuests = randQuests :+ question
-	  }
-	  randQuests = rand.shuffle(randQuests)
-	  // ВАЖНО!!!
-	  // Вот тут успешный результат получения рандомных вопросов
-	  Ok(randQuests.length.toString)
-	}else if(randQuests.length != 18){
-	  Redirect(routes.Static.home).flashing(
-	    "error" -> "Для обраних вами предметів недостатньо питань"
-	  )
-	}else{
-	  Redirect(routes.Static.home).flashing(
-	    "error" -> "Для обраних вами предметів недостатньо білетів"
-	  )
+	for(bilet <- Bilet.inLesson(lesson.id)){
+	  questionsAllowed = questionsAllowed ::: Question.findByBilet(bilet.id)
 	}
-      }else
-	Redirect(routes.Static.home).flashing(
-	  "error" -> "Ви вже приймали сьогдні участь у щоденному змаганні."
-	)
+      }
+      val microStat = microDailyStat.getByTime(user.id, current_day)
+      if(microStat.length != 0) {
+	Redirect(routes.Static.home).flashing("error" -> "Ви вже брали участь у змаганнях сьогодні.")
+      }else{
+	// Начинаем по крупицам собирать нужные 18 вопросов
+	var randQuestions: List[Question] = List()
+	// Начнем с первого типа, и т.д.
+	val firstType = questionsAllowed.filter(x => x.typ == 1)
+	val secondType = questionsAllowed.filter(x => x.typ == 2)
+	val thirdType = questionsAllowed.filter(x => x.typ == 3)
+	if(firstType.length < 6 || secondType.length < 6 || thirdType.length < 6)
+	  Redirect(routes.Static.home).flashing("error" -> s"${questionsAllowed}")
+	else{
+	  for(i <- 1 to 6){
+	    var first = firstType(rand.nextInt(firstType.length))
+	    var second = secondType(rand.nextInt(secondType.length))
+	    var third = thirdType(rand.nextInt(thirdType.length))
+	    if(randQuestions.contains(first)){
+	      while(!randQuestions.contains(first)){
+		first = firstType(rand.nextInt(firstType.length))
+	      }
+	    }
+	    if(randQuestions.contains(second)){
+	      while(!randQuestions.contains(second)){
+		second = secondType(rand.nextInt(secondType.length))
+	  }
+	    }
+	    if(randQuestions.contains(third)){
+	      while(!randQuestions.contains(third)){
+		second = thirdType(rand.nextInt(thirdType.length))
+	      }
+	    }  
+	    randQuestions = rand.shuffle(randQuestions :+ first :+ second :+ third)
+	  }
+	  var bilet_ids_last = ""
+	  randQuestions.foreach(x => bilet_ids_last+=(x.id+"~"))
+	  microDailyStat.create(user.id, current_day, 0, bilet_ids_last)
+	  Ok(views.html.lessons.daily(randQuestions, "00:05:00"))
+	}	  
+      }      
     }
-		      }
+		    }
 
-  // Вспомогательная функция, опредетяет, записано ли в масиве уже значение
+   // Вспомогательная функция, опредетяет, записано ли в масиве уже значение
 
   def dailyEngine = withUser {user => request =>
-   /* var ra = 0
-    var max = 0
+    // Находим текущую дату
+    var ra = 0
+    var max = 0			     
+    val current_date = currentDate
+    val microDaily = microDailyStat.getByTime(user.id, current_date)
+    // Получаем вопросы, на которые отвечал пользователь
+    val ids_list = (microDaily(0).ids).split("~")
+    var questions: List[Question] = List()
+    ids_list.foreach(id => questions :+ Question.find(id.toLong))
     val forma = request.body.asFormUrlEncoded
-    val questions = Question.findByBilet(bilet.id)
     for(question <- questions){
       var answer = ""
       var right = 0
@@ -303,19 +314,12 @@ object Lessons extends Controller{
 	if(answer == question.answer) {ra += 2; right = 1}
 	max += 2
       }
-      Stat.newStat(user.id, bilet.id, question.id, right, answer)
+      DailyStat.newDailyStat(user.id, question.id, right, answer)
     }
-    BiletStat.newBiletStat(user.id, bilet.id, ra, max)
-    val perc = (ra*100)/max
-    if(perc>70)
-      Redirect(routes.Lessons.biletStat(bilet.id)).flashing(
-	"success" -> s"Зараховано! Ви набрали ${perc}%." 
-      )
-    else
-      Redirect(routes.Lessons.biletStat(bilet.id)).flashing(
-	"error" -> s"Не зараховано :(. Ви набрали ${perc}%."
-      )*/
-    Redirect(routes.Static.home)
+    val startTime = request.cookies.get("start")
+    val endTime = request.cookies.get("end")
+    microDailyStat.update(user.id, startTime.getOrElse("1").toString, ra)
+    Redirect(routes.Static.home).flashing("success" -> s"${ra}")
   }
   
   // Подгрузка билетов 
@@ -383,5 +387,14 @@ object Lessons extends Controller{
   def split[A](xs: List[A], n: Int): List[List[A]] = {
     if (xs.size <= n) xs :: Nil
     else (xs take n) :: split(xs drop n, n)
+  }
+  
+  def currentDate = {
+    import java.util.Calendar
+    import java.text.SimpleDateFormat
+    val today = Calendar.getInstance().getTime()
+    val formatter = new SimpleDateFormat("YYYY:MM:dd")
+    val current_day = formatter.format(today)
+    current_day
   }
 }

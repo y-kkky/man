@@ -1,4 +1,4 @@
-@()(implicit flash: Flash, request: play.api.mvc.Request[Any])
+@(message1: String)(implicit flash: Flash, request: play.api.mvc.Request[Any])
 @import layouts._
 @main("ЗНО 2014") {
     @flash.get("success").map { message =>
@@ -13,6 +13,12 @@
             @message
         </div>
     }
+	@if(message1!=""){
+        <div class="alert alert-error">
+          <button type="button" class="close" data-dismiss="alert">&times;</button>
+          @message1
+        </div>
+	}
     <div class="center hero-unit">
         <h1>Вітаємо на сайті для підготовки до ЗНО</h1>
         <a href="@routes.Static.home"></a>

@@ -17,7 +17,7 @@ case class Stat(user_id: Long, bilet_id: Long, question_id: Long, right: Int, an
 
 case class DailyStat(user_id: Long, question_id: Long, right: Int, answer: String)
 
-case class microDailyStat(user_id: Long, time: String, score: Long)
+case class microDailyStat(user_id: Long, time: String, score: Long, ids: String)
 
 case class BiletStat(user_id: Long, bilet_id: Long, ra: Int, max: Int)
 
@@ -107,6 +107,12 @@ object Question {
       get[String]("Questions.answer") map {
 	case id ~ bilet_id ~ typ ~ text ~ image  ~  answer => Question(id, bilet_id, typ, text, image, answer)
     }
+  }
+
+  def all: List[Question] = {
+    DB.withConnection( implicit connection =>
+      SQL("select * from Questions").as(Question.simple *)
+		    )
   }
 
   def create(bilet_id: Long, typ: Int, text: String, image: String, answer: String) = {
@@ -316,16 +322,28 @@ object BiletStat {
 
 object microDailyStat {
   val simple = {
-    get[Long]("mircoDailyStat.user_id") ~ 
-    get[String]("mircoDailyStat.curr_time") ~ 
-    get[Long]("mircoDailyStat.score") map {
-      case user_id ~ time ~ score => microDailyStat(user_id, time, score) 
+    get[Long]("microDailyStat.user_id") ~ 
+    get[String]("microDailyStat.curr_time") ~ 
+    get[Long]("microDailyStat.score") ~
+    get[String]("microDailyStat.ids")map {
+      case user_id ~ time ~ score ~ ids => microDailyStat(user_id, time, score, ids) 
     }
   }
   
-  def create(user_id: Long, time: String, score: Long) = {
+  def create(user_id: Long, time: String, score: Long, ids: String) = {
     DB.withConnection(implicit connection =>
-      SQL("insert into microDailyStat (user_id, curr_time, score) VALUES ({user_id}, {time}, {score})").on(
+      SQL("insert into microDailyStat (user_id, curr_time, score, ids) VALUES ({user_id}, {time}, {score}, {ids})").on(
+	'user_id -> user_id,
+	'time -> time,
+	'score -> score,
+	'ids -> ids
+      ).executeUpdate()
+    )
+  }
+
+  def update(user_id: Long, time: String, score: Long) = {
+    DB.withConnection(implicit connection =>
+      SQL("update microDailyStat set score={score} where user_id={user_id} and curr_time={time}").on(
 	'user_id -> user_id,
 	'time -> time,
 	'score -> score
@@ -335,7 +353,7 @@ object microDailyStat {
 
   def getByTime(user_id: Long, time: String): List[microDailyStat] = {
     DB.withConnection(implicit connection =>
-      SQL("select * from mircoDailyStat where user_id={user_id} and curr_time={time}").on(
+      SQL("select * from microDailyStat where user_id={user_id} and curr_time={time}").on(
 	'user_id -> user_id,
 	'time -> time
       ).as(microDailyStat.simple *)

@@ -1,17 +1,26 @@
+start = Date.getTime();
+writeCookie("start", start, 1);
+
 function otmena(){
     window.onbeforeunload = function(){
 	
     }
-    if(confirm("Ви впевнені, що хочете завершити розв'язання тесту?"))
-	return true;
-    else
-	return false;
+    if(document.title!="Щоденне змагання"){
+	if(confirm("Ви впевнені, що хочете завершити розв'язання тесту?"))
+	    return true;
+	else
+	    return false;
+    }
 }
 
 function starter(){
-    if(!confirm("Розпочати розв'язання тесту з урахуванням часу?")){
-	var timer = document.getElementById("timer");
-	timer.parentNode.removeChild(timer);
+    if(document.title!="Щоденне змагання"){
+	if(!confirm("Розпочати розв'язання тесту з урахуванням часу?")){
+	    var timer = document.getElementById("timer");
+	    timer.parentNode.removeChild(timer);
+	}else{
+	    startTimer();
+	}
     }else{
 	startTimer();
     }
@@ -44,6 +53,25 @@ function startTimer() {
     document.getElementById("timer").innerHTML = h+":"+m+":"+s;
     setTimeout(startTimer, 1000);
 }
-window.onbeforeunload = function(){
-    return "Ви впевнені, що хочете покинути/оновити сторінку? Введені вами відповіді будуть втрачені!!!";
+if(document.title != "Щоденне змагання"){
+    window.onbeforeunload = function(){
+	return "Ви впевнені, що хочете піти з цієї сторінки? Ваші дані не будуть збережені!";
+    }
+}
+
+window.onunload = function(){
+	end = Date.getTime();
+	writeCookie("end", end, 1)
+    }
+
+function writeCookie(name,value,days) {
+    var date, expires;
+    if (days) {
+        date = new Date();
+        date.setTime(date.getTime()+(days*24*60*60*1000));
+        expires = "; expires=" + date.toGMTString();
+            }else{
+        expires = "";
+    }
+    document.cookie = name + "=" + value + expires + "; path=/";
 }

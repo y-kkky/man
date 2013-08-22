@@ -48,10 +48,11 @@ create table DailyStat (
  right_a     integer,
  answer	     varchar
 );
-create table mircoDailyStat (
+create table microDailyStat (
  user_id     integer,
  curr_time   varchar,
- score	     integer
+ score	     integer,
+ ids	     varchar
 )
 # --- !Downs
 drop table if exists Lessons;

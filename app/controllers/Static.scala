@@ -7,7 +7,7 @@ import java.util.Random
 object Static extends Controller {
 
   def home = Action {
-    implicit request => Ok(views.html.static_pages.home())
+    implicit request => Ok(views.html.static_pages.home(""))
   }
 
   def about = Action {
