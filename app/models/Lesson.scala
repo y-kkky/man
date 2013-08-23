@@ -374,12 +374,12 @@ object microDailyStat {
     )
   }
 
+  def rate(pattern: String): List[microDailyStat] = {
+    DB.withConnection(implicit connection =>
+      SQL("select * from microDailyStat where curr_time LIKE {pattern}").on(
+	'pattern -> pattern
+      ).as(microDailyStat.simple *)
+    )
+  }
+
 }
-
-
-
-
-
-
-
-

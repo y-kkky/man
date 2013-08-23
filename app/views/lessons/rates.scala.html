@@ -1,5 +1,23 @@
-@()(implicit request: play.api.mvc.Request[Any])
+@(stat: List[microDailyStat])(implicit request: play.api.mvc.Request[Any])
 @import layouts._
-@mainfoot("Рейтинг") {
-
+@import models.mUser
+@main("Рейтинг") {
+<table class="table table-hover table-bordered">
+<thead>
+  <tr>
+    <th>Учень</th>
+    <th>Кількість набраних очок</th>
+    <th>Час</th>
+  </tr>
+</thead>
+<tbody>
+@stat.map{stat =>
+<tr>
+  <td>@stat.user_id</td>
+  <td>@stat.score</td>
+  <td>@stat.result_time</td>
+</tr>
+}
+</tbody>
+</table>
 }

@@ -359,7 +359,20 @@ object Lessons extends Controller{
 				 }
 
   def dailyRates(typ: String) = withUser{ user => implicit request =>
-    Ok(views.html.lessons.rates())
+    if(typ != "day" && typ != "month" && typ != "year" && typ != "all"){
+      Redirect(routes.Lessons.profDaily())
+    }else{
+      var pattern: String = currentDate
+      if(typ == "month"){
+	pattern = pattern.drop(2)
+      }else if(typ == "year"){
+	pattern = pattern.drop(4)
+      }else if(typ == "all"){
+	pattern = ""
+      }
+      val statList = microDailyStat.rate("%" + pattern)
+      Ok(views.html.lessons.rates(statList))
+    }
 					}
   // Показ вопросов по статистике ежедневных соревнований
   def showDailyQuestionStat(question: Question, number: Int, stat: DailyStat) = {
@@ -489,7 +502,7 @@ object Lessons extends Controller{
     if (xs.size <= n) xs :: Nil
     else (xs take n) :: split(xs drop n, n)
   }
-  
+
   def currentDate = {
     import java.util.Calendar
     import java.text.SimpleDateFormat
