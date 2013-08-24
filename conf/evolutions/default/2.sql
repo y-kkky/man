@@ -45,13 +45,15 @@ create table BiletStat (
 create table DailyStat (
  user_id     integer,
  question_id integer,
+ curr_time   varchar,
  right_a     integer,
  answer	     varchar
 );
 create table microDailyStat (
  user_id     integer,
  curr_time   varchar,
- score	     integer,
+ res_time    integer,
+ score	     double,
  ids	     varchar
 )
 # --- !Downs

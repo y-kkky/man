@@ -28,7 +28,8 @@ POST        /profile/edit                controllers.User.changeUser
 POST        /profile/editLess            controllers.User.changeLesson
 GET         /profile/:id                 controllers.User.profile(id: Int)
 GET 		/preparation 				 controllers.User.preparation
-
+GET         /daily/profile	         controllers.Lessons.profDaily
+POST	    /dailystatredirect		 controllers.Lessons.dailyStatRedirect
 # Password recovery
 GET         /recover                     controllers.User.forgotPassword
 POST        /recover                     controllers.User.recoverPassword
@@ -49,3 +50,7 @@ POST	    /loadengine			 controllers.Lessons.postLoad
 # daily challenge
 GET	    /daily			 controllers.Lessons.daily
 POST	    /dailyengine		 controllers.Lessons.dailyEngine
+#daily challenge stat
+GET         /dailystat/:time		 controllers.Lessons.dailyStatGet(time: String)
+#rates
+GET	    /daily/rate/:type	         controllers.Lessons.dailyRates(type: String)

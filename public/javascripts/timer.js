@@ -1,16 +1,19 @@
-start = Date.getTime();
-writeCookie("start", start, 1);
-
 function otmena(){
-    window.onbeforeunload = function(){
-	
-    }
-    if(document.title!="Щоденне змагання"){
-	if(confirm("Ви впевнені, що хочете завершити розв'язання тесту?"))
+    // Проверяем, учавствовал ли сегодня человек в соревновании
+    if(document.title=="Щоденне змагання"){
+	var d = new Date();
+	createCookie("zit", d.getTime(), 10); 
+    }else{
+	if(confirm("Ви впевнені, що хочете завершити розв'язання тесту?")){
 	    return true;
+	}
 	else
 	    return false;
     }
+    window.onbeforeunload = function(){
+
+    }
+    
 }
 
 function starter(){
@@ -20,9 +23,13 @@ function starter(){
 	    timer.parentNode.removeChild(timer);
 	}else{
 	    startTimer();
+	    var d = new Date();
+	    createCookie("tiz", d.getTime(), 10);
 	}
     }else{
 	startTimer();
+	var d = new Date();
+	createCookie("tiz", d.getTime(), 10)
     }
 }
 function startTimer() {
@@ -59,19 +66,13 @@ if(document.title != "Щоденне змагання"){
     }
 }
 
-window.onunload = function(){
-	end = Date.getTime();
-	writeCookie("end", end, 1)
-    }
 
-function writeCookie(name,value,days) {
-    var date, expires;
-    if (days) {
-        date = new Date();
-        date.setTime(date.getTime()+(days*24*60*60*1000));
-        expires = "; expires=" + date.toGMTString();
-            }else{
-        expires = "";
-    }
-    document.cookie = name + "=" + value + expires + "; path=/";
+function createCookie(name,value,days) {
+	if (days) {
+		var date = new Date();
+		date.setTime(date.getTime()+(days*24*60*60*1000));
+		var expires = "; expires="+date.toGMTString();
+	}
+	else var expires = "";
+	document.cookie = name+"="+value+expires+"; path=/";
 }

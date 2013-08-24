@@ -1,0 +1,57 @@
+@(time: List[String])(implicit flash: Flash, request: play.api.mvc.Request[Any])
+@import layouts._
+@main("Підготовка") {
+<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<link rel="stylesheet" href="@routes.Assets.at("stylesheets/highlight.css")" type="text/css" media="screen" />
+<script>
+  $(function() {
+  $('#datepicker').datepicker({
+    beforeShowDay: highlightOdds
+  });
+  });
+</script>
+<script>
+  function highlightOdds(date) {    
+  var arr = [@time.map {time => new Date(Date.parse("@time")), }new Date(Date.parse("01/01/2000"))];
+  //var boole = (day.getYear() == date.getYear() && day.getMonth() == date.getMonth() && day.getDate() == date.getDate())
+  var ppp = new Date(date.getYear(), date.getMonth(), date.getDate())
+  var boole = contains(arr, date);
+  return [true, (boole) ? 'odd' : ''];
+  }
+  function contains(a, obj) {
+    for (var i = 0; i < a.length; i++) {
+        if (a[i].getYear() == obj.getYear() && a[i].getMonth() == obj.getMonth() && a[i].getDate() == obj.getDate() ) {
+            return true;
+        }
+    }
+    return false;
+   }
+</script>
+    @flash.get("success").map { message =>
+        <div class="alert alert-success">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            @message
+        </div>
+    }
+    @flash.get("error").map { message =>
+        <div class="alert alert-error">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            @message
+        </div>
+    }
+<div class="well center">
+  <a href="@routes.Lessons.daily" onclick="return confirm('Ви впевнені, що хочете почати? Під час розв`язання ні в якому разі не оновлюйте і не закривайте сторінку!!!');" class="btn btn-large btn-info">Щоденне змагання</a>
+</div>
+<div class="well">
+  <h3>Статистика щоденних змагань</h3><br>
+  <form action="@routes.Lessons.dailyStatRedirect" method="POST">
+    <p>Оберіть дату: <input type="text" name="datepicker" id="datepicker">
+      <input type="submit" value="Перейти"></p>
+  </form>
+</div>
+<div class="well">
+    <h3>Рейтинги</h3>
+    
+</div>
+	}

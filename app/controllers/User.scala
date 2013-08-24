@@ -148,7 +148,7 @@ object User extends Controller with Secured {
       editForm.bindFromRequest.fold(
         formWithErrors => BadRequest(views.html.user.edit(gravatarFor(username(request).toString), formWithErrors, lessonForm)),
         user => {
-          if(user._4 != "" && user._5 != ""){
+          if(user._4 != "" && user._5 != "") {
             if(uuser.pass != mUser.hashPass(user._3))
               Redirect(routes.User.edit).flashing("error" -> "Ви неправильно ввели старий пароль")
             else if(user._4 != user._5)
@@ -158,8 +158,12 @@ object User extends Controller with Secured {
               Redirect(routes.User.profile(uuser.id)).flashing("success" -> "Пароль був успішно змінений").withSession(Security.username -> user._1)
             }
           }else{
-            mUser.edit(uuser.id, user._1, user._2, uuser.pass, user._6, user._7, user._8)
-            Redirect(routes.User.profile(uuser.id)).flashing("success" -> "Профіль був успішно змінений").withSession(Security.username -> user._1)
+	    if(user._4 != user._5 || user._3 != "")
+	      Redirect(routes.User.edit).flashing("error" -> "Ви не повністю заповнили форму зміни пароля")
+	    else{
+              mUser.edit(uuser.id, user._1, user._2, uuser.pass, user._6, user._7, user._8)
+              Redirect(routes.User.profile(uuser.id)).flashing("success" -> "Профіль був успішно змінений").withSession(Security.username -> user._1)
+	    }
           }
         })
   }

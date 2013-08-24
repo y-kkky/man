@@ -1,0 +1,6 @@
+function highlightOdds(date) {    
+    var days = new Array();
+    days[0] = new Date(2013, 1, 1);
+    var found = $.inArray(date, days)
+    return [true, found == 1 ? 'odd' : ''];
+}

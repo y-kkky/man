@@ -8,7 +8,7 @@
   @for(question <- questions.zipWithIndex){
     @Html(Lessons.showQuestion(question._1, question._2))
   }
-  <div id="right">
+  <div id="right" onload="makeDesign()">
     <span id="timer">@time</span>
     <input type="submit" value="Завершити" id="end" onclick="return otmena();">
   </div>

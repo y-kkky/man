@@ -25,7 +25,10 @@
         <h2>This is the home page for the Yarik Krukovsky MAN project</h2>
 
         <a href="#more" role="button" class="btn btn-large btn-primary" data-toggle="modal">Дізнатися більше</a><br><br>
-        <a href="@routes.Lessons.allLessons"class="btn btn-large btn-info" data-toggle="modal">Предмети</a>
+        <a href="@routes.Lessons.allLessons" class="btn btn-large btn-info">Предмети</a>
+	@if(!request.session.get(Security.username).isEmpty){
+	<a href="@routes.Lessons.daily" onclick="return confirm('Ви впевнені, що хочете почати? Під час розв`язання ні в якому разі не оновлюйте і не закривайте сторінку!!!');" class="btn btn-large btn-info">Щоденне змагання</a>
+	}
     </div>
 
     <!-- Button to trigger modal -->

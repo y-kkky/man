@@ -1,0 +1,37 @@
+@(user: mUser, lessons: List[Lesson])(implicit flash: Flash, request: play.api.mvc.Request[Any])
+@import layouts._
+@import controllers.Lessons
+@if(lessons.isEmpty){
+@main("Підготовка"){
+<div class="hero-unit well">
+  <h2>Для підготовки <a href="@routes.User.edit">оберіть предмети</a>, до тестування за якими ви будете готуватися.</h2>
+</div>
+}
+}else{
+@mainfoot("Підготовка") {
+    @flash.get("success").map { message =>
+        <div class="alert alert-success">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            @message
+        </div>
+    }
+    @flash.get("error").map { message =>
+        <div class="alert alert-error">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            @message
+        </div>
+    }
+    @lessons.map {lesson =>
+   <a href="@routes.Lessons.prep(lesson.id)" style="text-decoration: none;"><div class="lesson well">
+        <h2>@lesson.name</h2><br>
+        <h2>@Lessons.lessonStat(user.id, lesson.id)%</h2>
+        <div class="progress">
+            <div class="bar" style="width: @Lessons.lessonStat(user.id, lesson.id)%"></div>
+        </div>
+    </div></a><br><br>
+    }
+   @if(lessons.length == 1){
+     <br><br><br><br><br><br><br><br><br><br><br><br><br>
+   }
+}
+}

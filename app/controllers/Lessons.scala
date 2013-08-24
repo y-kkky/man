@@ -235,25 +235,25 @@ object Lessons extends Controller{
 	val secondType = questionsAllowed.filter(x => x.typ == 2)
 	val thirdType = questionsAllowed.filter(x => x.typ == 3)
 	if(firstType.length < 6 || secondType.length < 6 || thirdType.length < 6)
-	  Redirect(routes.Static.home).flashing("error" -> s"${questionsAllowed}")
+	  Redirect(routes.Static.home).flashing("error" -> "З обраних вами предметів недостатньо питань для щоденного змагання")
 	else{
 	  for(i <- 1 to 6){
 	    var first = firstType(rand.nextInt(firstType.length))
 	    var second = secondType(rand.nextInt(secondType.length))
 	    var third = thirdType(rand.nextInt(thirdType.length))
 	    if(randQuestions.contains(first)){
-	      while(!randQuestions.contains(first)){
+	      while(randQuestions.contains(first)){
 		first = firstType(rand.nextInt(firstType.length))
 	      }
 	    }
 	    if(randQuestions.contains(second)){
-	      while(!randQuestions.contains(second)){
+	      while(randQuestions.contains(second)){
 		second = secondType(rand.nextInt(secondType.length))
 	  }
 	    }
 	    if(randQuestions.contains(third)){
-	      while(!randQuestions.contains(third)){
-		second = thirdType(rand.nextInt(thirdType.length))
+	      while(randQuestions.contains(third)){
+		third = thirdType(rand.nextInt(thirdType.length))
 	      }
 	    }  
 	    randQuestions = rand.shuffle(randQuestions :+ first :+ second :+ third)
@@ -269,16 +269,18 @@ object Lessons extends Controller{
 
    // Вспомогательная функция, опредетяет, записано ли в масиве уже значение
 
-  def dailyEngine = withUser {user => request =>
+  def dailyEngine = withUser { user => request =>
     // Находим текущую дату
-    var ra = 0
-    var max = 0			     
+    var ra: Double = 0
+    var max: Double = 0			     
     val current_date = currentDate
     val microDaily = microDailyStat.getByTime(user.id, current_date)
     // Получаем вопросы, на которые отвечал пользователь
-    val ids_list = (microDaily(0).ids).split("~")
+    val ids_list: List[String] = (microDaily(0).ids).split("~").toList
     var questions: List[Question] = List()
-    ids_list.foreach(id => questions :+ Question.find(id.toLong))
+    for(id <- ids_list)
+      questions = questions :+ Question.find(id.toLong)
+//    ids_list.foreach(id => questions :+ Question.find(id.toLong))
     val forma = request.body.asFormUrlEncoded
     for(question <- questions){
       var answer = ""
@@ -314,14 +316,113 @@ object Lessons extends Controller{
 	if(answer == question.answer) {ra += 2; right = 1}
 	max += 2
       }
-      DailyStat.newDailyStat(user.id, question.id, right, answer)
+      DailyStat.newDailyStat(user.id, question.id, current_date, right, answer)
     }
-    val startTime = request.cookies.get("start")
-    val endTime = request.cookies.get("end")
-    microDailyStat.update(user.id, startTime.getOrElse("1").toString, ra)
-    Redirect(routes.Static.home).flashing("success" -> s"${ra}")
+    val startTime = request.cookies.get("tiz").getOrElse(new play.api.mvc.Cookie("tiz", "0")).value
+    val endTime = request.cookies.get("zit").getOrElse(new play.api.mvc.Cookie("vit", "0")).value
+    val resultTime = endTime.toLong - startTime.toLong
+    // Время есть, теперь находим процент
+    val perc: Double = (ra * 100)/max
+    microDailyStat.update(user.id, resultTime, current_date, ra)
+    Redirect(routes.Lessons.dailyStatGet(current_date)).flashing("success" -> s"Ваш результат: ${perc} балів зі 100")
   }
-  
+
+  // Отображение страницы статистики
+  def dailyStatGet(time: String) = withUser {user => implicit request =>
+    val microDaily = microDailyStat.getByTime(user.id, time)
+    if(microDaily.length == 0)
+      NotFound(views.html.errors.onHandlerNotFound(request))
+    else{
+      // Получаем вопросы, на которые отвечал пользователь
+      val ids_list: List[String] = (microDaily(0).ids).split("~").toList
+      var questions: List[Question] = List()
+      var tempQuest: Question = new Question(0, 0, 0, "", "", "")
+      var dailyStatList: List[DailyStat] = List()
+      for(id <- ids_list){
+	tempQuest = Question.find(id.toLong)  
+	questions = questions :+ tempQuest
+	dailyStatList = dailyStatList :+ DailyStat.find(user.id, id.toLong, time)
+      }					     
+      Ok(views.html.lessons.dailystat(questions, dailyStatList))
+    }
+  }
+
+  def dailyStatRedirect = withUser{ user => implicit request =>
+    val forma = request.body.asFormUrlEncoded
+    val dateArray = (forma.get("datepicker")(0)).split("/")
+    if(dateArray.length != 3){
+      Redirect(routes.Lessons.profDaily())
+    }else{
+      val resultDate = dateArray(1) + "/" + dateArray(0) + "/" + dateArray(2)	   
+      Redirect(routes.Lessons.dailyStatGet(resultDate))
+    }
+				 }
+
+  def dailyRates(typ: String) = withUser{ user => implicit request =>
+    Ok(views.html.lessons.rates())
+					}
+  // Показ вопросов по статистике ежедневных соревнований
+  def showDailyQuestionStat(question: Question, number: Int, stat: DailyStat) = {
+    var result = ""
+    if(question.image!="")
+      result = s"""<div id='questionstat' class='well'>${number+1}. ${question.text}<br><img src='${question.image}'/>"""
+    else 
+      result = s"""<div id='questionstat' class='well'>${number+1}. ${question.text}"""
+    val variants = Variant.findByQuestion(question.id)
+    if(question.typ == 1 || question.typ == 3){
+      if(stat.answer == "none" || stat.answer == ""){
+	result += "<p>Правильна відповідь: " + question.answer + "</p>"
+	result += "<p>Ви не відповідали на це питання.</p>"
+      }
+      else{
+	result += "<p>Правильна відповідь: " + question.answer + "</p><p>Ваша відповідь: "
+	if(stat.right==1)
+	  result+="<span style='color: green;'>"
+	else
+	  result+="<span style='color: red;'>"
+	result += stat.answer
+	result += "</span></p>"
+	}
+    }else if(question.typ==2){
+      result = s"""<div id='question' class='well'>${number+1}. ${question.text}
+<img src='${question.image}'/>"""
+      var varstring = ""
+      val lis = split(variants, variants.length/2)
+      val right_answer = (question.answer).split("~")
+      val user_answer = (stat.answer).split("~")
+      val length = user_answer.length
+      var color = ""
+      for(i <- 0 to (length-1)){
+	if(user_answer(i)==right_answer(i))
+	  color = "green"
+	else
+	  color = "red"
+	varstring += s"<tr><td align=right><font color="+color+ s">${(lis(0))(i).text} ---- </font></td><td>"
+	if(user_answer(i)=="none")
+	  varstring += s"<font color=${color}>Ви не відповіли.</font></td><td>(Правильно - ${(lis(1))(i).text})</td></tr><br>"
+	else
+	  if(user_answer(i)==right_answer(i))
+	    varstring += s"<font color=${color}>${user_answer(i)}</font></td></tr><br>"
+	  else
+	    varstring += s"<font color=${color}>${user_answer(i)}</font></td><td>(Правильно - ${(lis(1))(i).text})</td></tr><br>"
+      }
+      result += s"<table>$varstring</table>"
+    }
+    result += "</div><div id='line'></div>"
+    result
+   }
+
+  def profDaily = withUser {user => implicit request => 
+    val statList: List[microDailyStat] = microDailyStat.getByUser(user.id)
+    var stringList: List[String] = List()
+    var hel = ""
+    for(stat <- statList){
+      var hel = (stat.time).split("/")
+      stringList = stringList :+ (hel(1)+"/"+hel(0)+"/"+hel(2))
+    }
+    Ok(views.html.lessons.profdaily(stringList))
+  }
+
   // Подгрузка билетов 
   //------------------------------------------------------------
   def getLoad = withUser { user => implicit request =>
@@ -393,7 +494,7 @@ object Lessons extends Controller{
     import java.util.Calendar
     import java.text.SimpleDateFormat
     val today = Calendar.getInstance().getTime()
-    val formatter = new SimpleDateFormat("YYYY:MM:dd")
+    val formatter = new SimpleDateFormat("dd/MM/YYYY")
     val current_day = formatter.format(today)
     current_day
   }
